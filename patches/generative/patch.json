@@ -1,0 +1,133 @@
+{
+  "name": "generative",
+  "title": "Generative tracks",
+  "pitch": "Tracks that play themselves. Flux grows a melody that keeps changing; Pulse spreads drum hits into grooves. Hold Seq and press Arp (Track 1: Drum) to start, turn the five knobs to shape it, record what it plays into the pattern with Record.",
+  "description": "Generative tracks: hold a track's Seq and press its Arp - Tracks 2..4 go into Flux, a melody loop that keeps changing; Track 1 (Seq + Drum) goes into Pulse, drum pulses spread evenly over each lane's steps - set with the five encoders; the track display shows FL / PU",
+  "firmware": {
+    "version": "2.5.20"
+  },
+  "sources": [
+    "generative.c",
+    "hooks.S"
+  ],
+  "models": {
+    "standard": {
+      "image": "keysteppro_main__fw2_5_20_2085__2024_03_04.bin",
+      "place": {
+        "flash": "0x0805D400",
+        "flash_size": "0x2C00",
+        "ram": "0xC01EC000",
+        "ram_size": "0xF00"
+      }
+    },
+    "chroma": {
+      "image": "keysteppro_main_chroma__fw2_5_20_375__2024_03_04.bin",
+      "place": {
+        "flash": "0x0805DC00",
+        "flash_size": "0x2C00",
+        "ram": "0xC01EC000",
+        "ram_size": "0xF00"
+      }
+    }
+  },
+  "hooks": [
+    {
+      "at": {
+        "standard": "0x080500F4",
+        "chroma": "0x08050774"
+      },
+      "asm": "bl gen_press_hook",
+      "what": "every button press, first thing in the press handler FUN_080500D8 (the Seq + Arp/Drum chord)"
+    },
+    {
+      "at": {
+        "standard": "0x08039BDC",
+        "chroma": "0x0803A194"
+      },
+      "asm": "b.w gen_play_hook",
+      "what": "the step player FUN_08039BDC(seq, track): a generative track plays its generated note"
+    },
+    {
+      "at": {
+        "standard": "0x08012730",
+        "chroma": "0x08012944"
+      },
+      "asm": "bl gen_turn_up_hook",
+      "what": "encoder turned up (FUN_08012338, b2=7)"
+    },
+    {
+      "at": {
+        "standard": "0x08013BE6",
+        "chroma": "0x08013DFA"
+      },
+      "asm": "bl gen_turn_down_hook",
+      "what": "encoder turned down (FUN_08012338, b2=8)"
+    },
+    {
+      "at": {
+        "standard": "0x0801269C",
+        "chroma": "0x080128B0"
+      },
+      "asm": "bl gen_touch_hook",
+      "what": "encoder touched (stock popup FUN_080100BC)"
+    },
+    {
+      "at": {
+        "standard": "0x080125AC",
+        "chroma": "0x080127C0"
+      },
+      "asm": "bl gen_untouch_hook",
+      "what": "encoder released (stock popup timer FUN_0801F7D8)"
+    },
+    {
+      "at": {
+        "standard": "0x0801696A",
+        "chroma": "0x08016B16"
+      },
+      "asm": "bl gen_flush_hook",
+      "what": "the main loop's LED flush FUN_08054C2C: our display tick runs after it"
+    },
+    {
+      "at": {
+        "standard": "0x080102E0",
+        "chroma": "0x080104F4"
+      },
+      "asm": "b.w gen_tx_hook",
+      "what": "FUN_080102E0, every packet to the UI MCU: step LEDs and the track display while generative"
+    }
+  ],
+  "parts": [
+    {
+      "cpu": "cortex-m0",
+      "sources": [
+        "ui_letters.S"
+      ],
+      "models": {
+        "standard": {
+          "image": "keysteppro_ui__fw0_0_1_1823__2024_03_04.bin",
+          "place": {
+            "flash": "0x0802F010",
+            "flash_size": "0xF0"
+          }
+        },
+        "chroma": {
+          "image": "keysteppro_ui_chroma__fw0_0_1_336__2024_03_03.bin",
+          "place": {
+            "flash": "0x0802F010",
+            "flash_size": "0xF0"
+          }
+        }
+      },
+      "hooks": [
+        {
+          "at": {
+            "standard": "0x0800B1D4",
+            "chroma": "0x0800B1D4"
+          },
+          "asm": "bl ui_letters",
+          "what": "the UI's track-display writer FUN_0800B1C4: values 0xA0.. draw letter pairs (FL, PU)"
+        }
+      ]
+    }
+  ]
+}

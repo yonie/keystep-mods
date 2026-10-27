@@ -1,0 +1,4 @@
+*.kspf
+*.bin
+__pycache__/
+*.pyc

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="128" viewBox="0 0 256 128">
+  <rect x="0.5" y="0.5" width="255" height="127" rx="10" fill="#15181d" stroke="#2b3037"/>
+  <rect x="10" y="10" width="236" height="26" rx="3" fill="#d6dde4"/>
+  <text x="128" y="29" text-anchor="middle" font-family="ui-monospace, Consolas, Menlo, monospace" font-size="19"
+        font-weight="700" fill="#15181d">Change</text>
+  <text x="128" y="88" text-anchor="middle" font-family="ui-monospace, Consolas, Menlo, monospace" font-size="34"
+        font-weight="700" fill="#e8eef4" textLength="81" lengthAdjust="spacingAndGlyphs">10 %</text>
+</svg>

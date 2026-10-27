@@ -1,0 +1,61 @@
+{
+  "name": "filter-midicc",
+  "title": "Clean pattern switches",
+  "pitch": "Switch patterns without your synth hiccuping: Program Change and Bank Select only go out when the sound actually changes, so the first note lands on time.",
+  "description": "Skip an unchanged Bank MSB / Bank LSB / Program Change on a pattern switch",
+  "firmware": {
+    "version": "2.5.20"
+  },
+  "source": "filter-midicc.s",
+  "models": {
+    "standard": {
+      "image": "keysteppro_main__fw2_5_20_2085__2024_03_04.bin",
+      "place": {
+        "flash": "0x0805D1AC",
+        "ram": "0xC01ECF00"
+      },
+      "symbols": {
+        "SENDER": "0x0801A708",
+        "SEND": "0x0801A7EC",
+        "EPILOGUE": "0x0801A794",
+        "POOL": "0x0801A880"
+      }
+    },
+    "chroma": {
+      "image": "keysteppro_main_chroma__fw2_5_20_375__2024_03_04.bin",
+      "place": {
+        "flash": "0x0805D900",
+        "ram": "0xC01ECF00"
+      },
+      "symbols": {
+        "SENDER": "0x0801A864",
+        "SEND": "0x0801A948",
+        "EPILOGUE": "0x0801A8F0",
+        "POOL": "0x0801A9DC"
+      }
+    }
+  },
+  "ram": {
+    "MAGIC": 4,
+    "REC": 64,
+    "FLAG": 1
+  },
+  "hooks": [
+    {
+      "at": {
+        "standard": "0x08035618",
+        "chroma": "0x08035C44"
+      },
+      "asm": "bl switch_send",
+      "what": "the pattern switch (FUN_08035404) calls the sender through switch_send"
+    },
+    {
+      "at": {
+        "standard": "0x0801A7E8",
+        "chroma": "0x0801A944"
+      },
+      "asm": "b.w check_and_record",
+      "what": "FUN_0801A708, after the channel and range checks"
+    }
+  ]
+}

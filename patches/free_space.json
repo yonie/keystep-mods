@@ -1,0 +1,94 @@
+{
+  "firmware": "keysteppro_main__fw2_5_20_2085__2024_03_04.bin",
+  "flash": [
+    "0x0805D1AC",
+    "0x0807FFF8"
+  ],
+  "ram": [
+    [
+      "0xC01EAB90",
+      "0xC01F0000"
+    ]
+  ],
+  "measured": {
+    "date": "2026-10-24",
+    "flash": "0x0805D1AC (image end) .. 0x0807FFF8 (header limit): no word-aligned literal is loaded by code (9 literal-pool values in that range are table data, no PC-relative load reaches them), and no read or execute there during boot + workload",
+    "ram": "SDRAM 0xC01EAB90..0xC01EFFFF (2026-10-27): the SDRAM is 2 MB (FMC_SDCR1 = 0x1910: 8 column bits, 11 row bits, 2 banks, 16-bit). The firmware lays it out as 16-project arrays from 0xC0000000 up to 0xC01D0000, then one block at 0xC01D0000..0xC01EAB90 and the 64 KB settings image at 0xC01F0000. Nothing writes 0xC01EAB90..0xC01EFFFF during boot plus 1500 random panel actions on either model, no literal points into it and no movw/movt builds an address there. Not cleared at boot: patches must not trust it without their own marker.",
+    "rejected": "the boot-zeroed SRAM 0x20000650..0x20020000 has untouched blocks, but each has firmware pointers into it (buffers for features the workload did not exercise) or sits at the bottom of a task stack",
+    "ram_ccm": "NOT the CCM (0x10000000): the main MCU has no working CCM there. Until 2026-10-27 the patches kept their state in it; on the device reads came back 0 and writes were lost, and the generative mod flooded the UI link and left the unit on its boot logo."
+  },
+  "slots": {
+    "note": "each patch gets a fixed place (patch.json \"place\") so the web front end can combine pre-assembled patches; a new patch takes the next free slot",
+    "standard": {
+      "filter-midicc": {
+        "flash": "0x0805D1AC..0x0805D3AC",
+        "ram": "0xC01ECF00..0xC01ECF48"
+      },
+      "generative": {
+        "flash": "0x0805D400..0x08060000",
+        "ram": "0xC01EC000..0xC01ECF00"
+      },
+      "generative (UI)": {
+        "flash": "0x0802F010..0x0802F100"
+      }
+    },
+    "chroma": {
+      "filter-midicc": {
+        "flash": "0x0805D900..0x0805DB00",
+        "ram": "0xC01ECF00..0xC01ECF48"
+      },
+      "generative": {
+        "flash": "0x0805DC00..0x08060800",
+        "ram": "0xC01EC000..0xC01ECF00"
+      },
+      "generative (UI)": {
+        "flash": "0x0802F010..0x0802F100"
+      }
+    }
+  },
+  "images": [
+    {
+      "firmware": "keysteppro_ui__fw0_0_1_1823__2024_03_04.bin",
+      "flash": [
+        "0x0802F004",
+        "0x08040000"
+      ],
+      "ram": [],
+      "measured": {
+        "date": "2026-10-26",
+        "flash": "0x0802F004 (image end) .. 0x0803FFFF (header limit): the UI firmware never unlocks its flash (no FLASH key constants) and nothing reads there",
+        "ram": "not used by any patch yet: 0x2000232A..0x20007C80 was untouched during boot and a workload, but the stack top is 0x20008000 and something past .bss reaches 0x2000232A"
+      }
+    },
+    {
+      "firmware": "keysteppro_main_chroma__fw2_5_20_375__2024_03_04.bin",
+      "flash": [
+        "0x0805D884",
+        "0x0807FFF8"
+      ],
+      "ram": [
+        [
+          "0xC01EAB90",
+          "0xC01F0000"
+        ]
+      ],
+      "measured": {
+        "date": "2026-10-26",
+        "flash": "0x0805D884 (image end) .. 0x0807FFF8 (header limit), as for the standard build",
+        "ram": "the same SDRAM block: the Chroma build programs the SDRAM controller identically (2 MB) and writes the same regions"
+      }
+    },
+    {
+      "firmware": "keysteppro_ui_chroma__fw0_0_1_336__2024_03_03.bin",
+      "flash": [
+        "0x0802F004",
+        "0x08040000"
+      ],
+      "ram": [],
+      "measured": {
+        "date": "2026-10-26",
+        "flash": "the payload is byte-identical to the standard UI image's"
+      }
+    }
+  ]
+}

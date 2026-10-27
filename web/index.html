@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KeyStep Pro Mods</title>
+<style>
+  :root {
+    --bg: #f3f4f6; --card: #ffffff; --ink: #1b1e24; --muted: #6a717c; --line: #dde1e6;
+    --accent: #1f9e88; --accent-ink: #ffffff; --bad: #c0392b; --good: #1f8f7a; --drop: #eaf6f3;
+    --panel: #16181d; --panel-line: #2a2e36; --panel-ink: #8b93a0;
+    --led: #2fd8c2; --led-dim: #24343a; --head: #ffffff; --mut: #e0359f;
+    --seg-on: #9fdcff; --seg-off: #1f2a33;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #101215; --card: #191c21; --ink: #e8eaed; --muted: #9aa1ab; --line: #2b3037;
+      --accent: #36b39a; --accent-ink: #0f1513; --bad: #e0675a; --good: #36b39a; --drop: #16231f;
+      --panel: #0d0f12; --panel-line: #262a31;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 36px 16px 48px; }
+  h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -.01em; }
+  .sub { color: var(--muted); margin: 0 0 28px; max-width: 60ch; }
+  section { margin-bottom: 28px; }
+  h2 { font-size: 15px; margin: 0 0 12px; display: flex; gap: 10px; align-items: center; }
+  .n { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%;
+       background: var(--accent); color: var(--accent-ink); font-size: 12px; font-weight: 600; }
+  .box { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+
+  /* the mods */
+  #mods { display: grid; gap: 16px; }
+  .mod { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; cursor: pointer;
+         transition: border-color .15s, box-shadow .15s; display: block; }
+  .mod:hover { border-color: var(--accent); }
+  .mod.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .vis { background: var(--panel); padding: 16px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .body { display: flex; gap: 12px; padding: 14px 18px 16px; align-items: flex-start; }
+  .body input { margin-top: 5px; width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
+  .title { font-weight: 650; font-size: 16px; }
+  .pitch { color: var(--ink); opacity: .85; font-size: 14px; margin-top: 2px; }
+  .meta { color: var(--muted); font-size: 12px; margin-top: 6px; }
+  .meta code { font: 12px ui-monospace, Consolas, monospace; }
+  a { color: var(--accent); }
+
+  /* the little panels inside a visual */
+  .mini { border: 1px solid var(--panel-line); border-radius: 10px; padding: 12px 14px 12px; min-width: 240px; }
+  .mini .top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .mini .lbl { color: var(--panel-ink); font: 600 11px/1 system-ui, sans-serif; letter-spacing: .12em; }
+  .seg rect { fill: var(--seg-off); } .seg rect.on { fill: var(--seg-on); }
+  .flux { display: grid; grid-template-columns: repeat(8, 22px); gap: 6px; justify-content: center; padding-top: 6px; }
+  .flux .col { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .flux .bar { width: 10px; height: 64px; position: relative; }
+  .flux .bar i { position: absolute; left: 0; width: 10px; height: 8px; border-radius: 2px; background: var(--led);
+                 box-shadow: 0 0 6px rgba(47,216,194,.5);
+                 transition: bottom .25s, background .2s; }
+  .flux .bar i.rest { background: transparent; box-shadow: none; }
+  .flux .led { width: 22px; height: 18px; border-radius: 4px; background: var(--led-dim); transition: background .12s; }
+  .flux .led.note { background: #1c6f66; }
+  .flux .led.head { background: var(--head); box-shadow: 0 0 8px rgba(255,255,255,.6); }
+  .flux .led.mut { background: var(--mut); box-shadow: 0 0 8px var(--mut); }
+  .flux .bar i.mut { background: var(--mut); }
+  svg.ring circle.d { transition: r .12s, opacity .12s; }
+  .mini.wide { width: 100%; max-width: 460px; min-width: 0; }
+  svg.midi { display: block; width: 100%; height: auto; }
+  svg.midi text { font: 600 9.5px system-ui, sans-serif; fill: var(--panel-ink); letter-spacing: .08em; }
+
+  #drop { border: 2px dashed var(--line); border-radius: 10px; padding: 22px; text-align: center; cursor: pointer;
+          color: var(--muted); transition: background .15s, border-color .15s; background: var(--card); }
+  #drop.over { background: var(--drop); border-color: var(--accent); }
+  #drop b { color: var(--ink); }
+  code { font: 13px ui-monospace, Consolas, monospace; background: var(--bg); padding: 1px 5px; border-radius: 4px;
+         overflow-wrap: anywhere; }
+  .hint { color: var(--muted); font-size: 13px; margin: 10px 2px 0; }
+  .status { margin-top: 10px; font-weight: 500; }
+  .status.good { color: var(--good); } .status.bad { color: var(--bad); }
+  button { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; padding: 12px 22px;
+           font: inherit; font-weight: 650; cursor: pointer; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  footer { color: var(--muted); font-size: 12.5px; margin-top: 32px; border-top: 1px solid var(--line); padding-top: 14px; }
+  footer p { margin: 6px 0; }
+  .wetmark { font-weight: 800; letter-spacing: -.01em; color: #fff; font-size: 17px; flex: none; }
+  .wetmark span { color: #3b82f6; }
+  .signoff { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-top: 30px; padding: 12px 12px 12px 20px;
+             border-radius: 999px; background: #171614; border: 1px solid #363230; color: #b3ada5; font-size: 14px;
+             box-shadow: 0 6px 18px rgba(23,22,20,.18); }
+  .signoff p { margin: 0; flex: 1 1 260px; }
+  .signoff a { flex: none; background: #3b82f6; color: #fff; border-radius: 999px; padding: 9px 18px; font-weight: 650;
+               text-decoration: none; transition: background .15s; }
+  .signoff a:hover { background: #2563eb; }
+  @media (max-width: 560px) {
+    .signoff { border-radius: 16px; padding: 16px 18px; }
+    .signoff a { width: 100%; text-align: center; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>KeyStep Pro Mods</h1>
+  <p class="sub">New tricks for your KeyStep Pro. Pick the mods you want, drop in the official firmware file, and flash
+    the result with MIDI Control Center like any update. Everything happens in this browser.
+    <a href="https://github.com/yonie/keystep-mods#readme">The guide</a> explains every mod, flashing, and going back.</p>
+
+  <section>
+    <h2><span class="n">1</span>Pick your mods</h2>
+    <div id="mods"></div>
+  </section>
+
+  <section>
+    <h2><span class="n">2</span>Your firmware file</h2>
+    <div id="drop" tabindex="0"><b>Drop the KeyStep Pro firmware update here</b>, or click to choose it
+      <input id="file" type="file" accept=".kspf" hidden></div>
+    <p class="hint">It is the file MIDI Control Center installed:
+      <code>C:\ProgramData\Arturia\MIDI Control Center\Firmware\keystep-pro_Firmware_Update_2.5.20.0.kspf</code></p>
+    <div id="stock" class="status"></div>
+  </section>
+
+  <section>
+    <h2><span class="n">3</span>Get your update</h2>
+    <div class="box">
+      <button id="build" disabled>Build my update</button>
+      <div id="result" class="status"></div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Flash the downloaded file with MIDI Control Center. To go back, flash the original update file. The mods work on
+      firmware 2.5.20, on the KeyStep Pro and the KeyStep Pro Chroma; your firmware file never leaves this browser.
+      Step by step: <a href="https://github.com/yonie/keystep-mods#flashing-it">flashing</a>,
+      <a href="https://github.com/yonie/keystep-mods#going-back-to-stock">going back</a> and
+      <a href="https://github.com/yonie/keystep-mods#if-it-does-not-start">if it does not start</a>.</p>
+    <p>Each mod is tested against the stock firmware before it is listed here. Use at your own risk: the mods come
+      without any warranty. Arturia and KeyStep Pro are trademarks of Arturia; this project is not affiliated with Arturia.</p>
+  </footer>
+  <div class="signoff"><span class="wetmark">WET<span>VST</span></span>
+    <p>Looking for more cool stuff? I also release open source audio VST plugins as WET VST.</p>
+    <a href="https://wetvst.com">Visit wetvst.com &rarr;</a></div>
+</main>
+
+<script src="kspatch.js"></script>
+<script src="patches/bundles.js"></script>
+<script>
+(function () {
+  'use strict';
+  const bundles = window.KSP_PATCHES || [];
+  const $ = id => document.getElementById(id);
+  const NS = 'http://www.w3.org/2000/svg';
+  const still = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let stockBytes = null;
+
+  // ---- tiny visuals: what each mod does, drawn live ------------------------------------------------------------
+  const el = (tag, attrs, parent, ns) => {
+    const e = ns ? document.createElementNS(NS, tag) : document.createElement(tag);
+    for (const k in attrs || {}) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  };
+
+  // a two-digit track display, as the KeyStep's 7-segment ones (bit 0 a .. bit 6 g)
+  function segDisplay(bytes, parent) {
+    const s = el('svg', { class: 'seg', width: 36, height: 22, viewBox: '0 0 36 22' }, parent, true);
+    const SEG = [[2, 0, 9, 2], [11, 2, 2, 8], [11, 12, 2, 8], [2, 20, 9, 2], [0, 12, 2, 8], [0, 2, 2, 8], [2, 10, 9, 2]];
+    bytes.forEach((b, d) => SEG.forEach(([x, y, w, h], i) =>
+      el('rect', { x: x + d * 20 + 2, y, width: w, height: h, rx: 1, class: b >> i & 1 ? 'on' : '' }, s, true)));
+    return s;
+  }
+  function mini(label, display, parent) {
+    const m = el('div', { class: 'mini' }, parent);
+    const top = el('div', { class: 'top' }, m);
+    el('span', { class: 'lbl' }, top).textContent = label;
+    if (display) segDisplay(display, top);
+    return m;
+  }
+
+  const ticks = [];                                  // every visual's step function, run on one clock
+  const rnd = n => Math.floor(Math.random() * n);
+
+  function fluxVisual(parent) {                      // a loop of 8 notes that keeps changing
+    const m = mini('FLUX', [0x71, 0x38], parent);
+    const grid = el('div', { class: 'flux' }, m);
+    const steps = Array.from({ length: 8 }, () => ({ note: rnd(7), on: Math.random() < .8 }));
+    const cols = steps.map(() => {
+      const c = el('div', { class: 'col' }, grid);
+      const bar = el('div', { class: 'bar' }, c);
+      return { dot: el('i', {}, bar), led: el('div', { class: 'led' }, c) };
+    });
+    let pos = 0, mut = -1;
+    const draw = () => cols.forEach((c, i) => {
+      const s = steps[i];
+      c.dot.style.bottom = (s.note * 9) + 'px';
+      c.dot.className = s.on ? (i === mut ? 'mut' : '') : 'rest';
+      c.led.className = 'led ' + (i === pos ? 'head' : i === mut ? 'mut' : s.on ? 'note' : '');
+    });
+    draw();
+    ticks.push(() => {
+      pos = (pos + 1) % 8;
+      if (Math.random() < .22) { steps[pos] = { note: rnd(7), on: Math.random() < .8 }; mut = pos; }
+      else if (mut >= 0 && mut !== pos) mut = -1;
+      draw();
+    });
+  }
+
+  function pulseVisual(parent) {                     // drum lanes, each its own number of pulses over its own steps
+    const m = mini('PULSE', [0x73, 0x3E], parent);
+    const s = el('svg', { class: 'ring', width: 132, height: 132, viewBox: '0 0 100 100', style: 'display:block;margin:0 auto' }, m, true);
+    const lanes = [{ n: 16, k: 5, r: 0, rad: 42, col: '#ff9a3c' },    // kick
+                   { n: 8, k: 3, r: 2, rad: 31, col: '#2fd8c2' },      // snare
+                   { n: 12, k: 7, r: 0, rad: 20, col: '#f2df4c' }];    // hat
+    const hit = (l, i) => ((((i - l.r) % l.n) + l.n) % l.n * l.k) % l.n < l.k;
+    lanes.forEach(l => {
+      el('circle', { cx: 50, cy: 50, r: l.rad, fill: 'none', stroke: '#2e343d', 'stroke-width': .8 }, s, true);
+      l.dots = Array.from({ length: l.n }, (_, i) => {
+        const a = -Math.PI / 2 + i * 2 * Math.PI / l.n;
+        return el('circle', { class: 'd', cx: 50 + l.rad * Math.cos(a), cy: 50 + l.rad * Math.sin(a), r: 2.8,
+                              fill: hit(l, i) ? l.col : '#353c46', opacity: hit(l, i) ? .6 : 1 }, s, true);
+      });
+      l.pos = 0;
+    });
+    const draw = () => lanes.forEach(l => l.dots.forEach((d, i) => {
+      const on = hit(l, i), now = i === l.pos;
+      d.setAttribute('r', now ? (on ? 5.2 : 3.4) : 2.8);
+      d.setAttribute('opacity', now ? 1 : on ? .6 : 1);
+      d.setAttribute('fill', now && !on ? '#ffffff' : on ? l.col : '#353c46');
+    }));
+    draw();
+    ticks.push(() => { lanes.forEach(l => { l.pos = (l.pos + 1) % l.n; }); draw(); });
+  }
+
+  function midiVisual(parent) {                      // four pattern switches: stock re-sends the sound each time
+    const m = mini('', null, parent);
+    m.classList.add('wide');
+    m.querySelector('.top').remove();
+    const W = 420, H = 150, X0 = 92, BAR = 78;
+    const s = el('svg', { class: 'midi', viewBox: `0 0 ${W} ${H}` }, m, true);
+    const rows = [{ y: 44, label: 'STOCK', every: true }, { y: 104, label: 'WITH MOD', every: false }];
+    const notes = [];
+    rows.forEach(r => {
+      el('text', { x: 0, y: r.y + 3 }, s, true).textContent = r.label;
+      el('line', { x1: X0 - 6, y1: r.y, x2: W - 4, y2: r.y, stroke: '#262b33' }, s, true);
+      for (let b = 0; b < 4; b++) {
+        const x = X0 + b * BAR;
+        el('line', { x1: x, y1: r.y - 20, x2: x, y2: r.y + 14, stroke: '#3a414b', 'stroke-dasharray': '2 2' }, s, true);
+        const sends = r.every || b === 0;
+        if (sends) for (let j = 0; j < 3; j++)                              // Bank MSB, Bank LSB, Program Change
+          el('rect', { x: x + 1 + j * 7, y: r.y - 17, width: 5, height: 10, rx: 1.5, fill: '#e0675a' }, s, true);
+        const late = sends ? 18 : 0;                                      // the synth is busy loading the sound
+        const n = el('circle', { cx: x + 4 + late, cy: r.y + 4, r: 5.5, fill: late ? '#e0675a' : '#2fd8c2', opacity: .5 }, s, true);
+        notes.push({ n, x: x + 4 + late });
+      }
+    });
+    el('text', { x: X0 + 1, y: 14 }, s, true).textContent = 'PATTERN SWITCHES';
+    const legend = [['#e0675a', 'rect', 'SOUND RELOAD'], ['#e0675a', 'circle', 'LATE NOTE'], ['#2fd8c2', 'circle', 'ON TIME']];
+    legend.forEach(([c, shape, txt], i) => {
+      const lx = X0 + i * 108, ly = H - 8;
+      if (shape === 'rect') el('rect', { x: lx, y: ly - 7, width: 5, height: 8, rx: 1.5, fill: c }, s, true);
+      else el('circle', { cx: lx + 3, cy: ly - 3, r: 4, fill: c }, s, true);
+      el('text', { x: lx + 11, y: ly }, s, true).textContent = txt;
+    });
+    const cur = el('line', { x1: X0, y1: 20, x2: X0, y2: H - 22, stroke: '#ffffff', 'stroke-width': 1, opacity: .6 }, s, true);
+    let t = 0;
+    ticks.push(() => {
+      t = (t + 8) % (4 * BAR + 24);
+      const x = X0 + t;
+      cur.setAttribute('x1', x); cur.setAttribute('x2', x);
+      notes.forEach(o => o.n.setAttribute('opacity', x >= o.x - 4 && x < o.x + 16 ? 1 : .5));
+    });
+  }
+
+  const VISUALS = { generative: v => { fluxVisual(v); pulseVisual(v); }, 'filter-midicc': midiVisual };
+  const GUIDE = { generative: '#generative-tracks-the-generative-mod',
+                  'filter-midicc': '#clean-pattern-switches-the-filter-midicc-mod' };
+
+  // ---- the mod cards --------------------------------------------------------------------------------------------
+  const list = $('mods');
+  const ORDER = ['generative', 'filter-midicc'];         // the showpiece first
+  const shown = [...bundles].sort((a, b) => (ORDER.indexOf(a.name) + 1 || 99) - (ORDER.indexOf(b.name) + 1 || 99));
+  for (const b of shown) {
+    const card = el('label', { class: 'mod on' }, list);
+    const vis = el('div', { class: 'vis', 'aria-hidden': 'true' }, card);
+    if (VISUALS[b.name]) VISUALS[b.name](vis); else vis.remove();
+    const body = el('div', { class: 'body' }, card);
+    const box = el('input', { type: 'checkbox', checked: '' }, body);
+    box.value = b.name;
+    const txt = el('div', {}, body);
+    el('div', { class: 'title' }, txt).textContent = b.title || b.name;
+    el('div', { class: 'pitch' }, txt).textContent = b.pitch || b.description;
+    const meta = el('div', { class: 'meta' }, txt);
+    el('code', {}, meta).textContent = b.name;
+    if (GUIDE[b.name]) {                                   // the README section for this mod
+      const a = el('a', { href: 'https://github.com/yonie/keystep-mods' + GUIDE[b.name], target: '_blank', rel: 'noopener' });
+      a.textContent = 'How it works';
+      meta.append(' · ', a);
+    }
+    meta.append(' \u00b7 firmware ' + b.firmware.version + ' \u00b7 ' +
+                [...new Set(b.parts.map(p => p.model === 'chroma' ? 'Chroma' : 'KeyStep Pro'))].join(' + '));
+  }
+  list.addEventListener('change', e => { e.target.closest('.mod').classList.toggle('on', e.target.checked); refresh(); });
+  if (!still) setInterval(() => ticks.forEach(f => f()), 160);
+
+  // ---- building -------------------------------------------------------------------------------------------------
+  function chosen() {
+    const names = Array.from(list.querySelectorAll('input:checked'), i => i.value);
+    return bundles.filter(b => names.includes(b.name));
+  }
+  function refresh() { $('build').disabled = !(stockBytes && chosen().length); }
+  function say(e, text, cls) { e.textContent = text; e.className = 'status ' + (cls || ''); }
+
+  async function load(file) {
+    stockBytes = null; refresh(); say($('result'), '');
+    say($('stock'), 'Checking ' + file.name + '...');
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      const r = await KSPatch.inspect(bytes, bundles);
+      if (!r.stock) {
+        say($('stock'), file.name + ' is not the untouched ' + (bundles[0] ? bundles[0].firmware.version : '') +
+            ' update (it says ' + r.info.version_number + '). Use the file MIDI Control Center installed.', 'bad');
+        return;
+      }
+      stockBytes = bytes;
+      say($('stock'), 'Got it: firmware ' + r.info.version_number + ', untouched.', 'good');
+    } catch (e) {
+      say($('stock'), e.message, 'bad');
+    }
+    refresh();
+  }
+
+  const drop = $('drop'), input = $('file');
+  drop.addEventListener('click', () => input.click());
+  drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') input.click(); });
+  input.addEventListener('change', () => input.files[0] && load(input.files[0]));
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('drop', e => {
+    e.preventDefault(); drop.classList.remove('over');
+    if (e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
+  });
+
+  $('build').addEventListener('click', async () => {
+    try {
+      const r = await KSPatch.build(stockBytes, chosen());
+      const url = URL.createObjectURL(new Blob([r.bytes], { type: 'application/octet-stream' }));
+      const a = document.createElement('a');
+      a.href = url; a.download = r.filename; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      say($('result'), 'Saved ' + r.filename + '. Flash it with MIDI Control Center.', 'good');
+    } catch (e) {
+      say($('result'), e.message, 'bad');
+    }
+  });
+  if (!bundles.length) say($('result'), 'No mods found (web/patches/bundles.js).', 'bad');
+})();
+</script>
+</body>
+</html>

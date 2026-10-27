@@ -1,0 +1,73 @@
+{
+ "name": "filter-midicc",
+ "title": "Clean pattern switches",
+ "pitch": "Switch patterns without your synth hiccuping: Program Change and Bank Select only go out when the sound actually changes, so the first note lands on time.",
+ "description": "Skip an unchanged Bank MSB / Bank LSB / Program Change on a pattern switch",
+ "firmware": {
+  "version": "2.5.20"
+ },
+ "parts": [
+  {
+   "model": "standard",
+   "image": "keysteppro_main__fw2_5_20_2085__2024_03_04.bin",
+   "sha256": "5cef3d2fa93610028dcb9a92c3d09949e6b56de79ff0d05050b61a57ff86fb15",
+   "writes": [
+    {
+     "at": "0x0805D1AC",
+     "bytes": "10b582b0049c00944cf6447cccf21e0ca5248cf80040bdf7a1fa4cf6447cccf21e0c00248cf8004002b010bd4cf60071ccf21e010a6844f24943c4f649539a4209d00b604cf60471ccf21e0100224023043bca50fcd107f00f004cf60471ccf21e0101eb80014cf64472ccf21e021278a52a0dd1cb78a52b0ad10b78ab4207d14b78b34204d18b78a34201d1bdf7acba0d704e708c70a523cb704af68008c0f60108d8f80080bdf7cbba"
+    },
+    {
+     "at": "0x08035618",
+     "bytes": "27f0c8fd"
+    },
+    {
+     "at": "0x0801A7E8",
+     "bytes": "42f0f6bc"
+    }
+   ],
+   "flash": [
+    "0x0805D1AC",
+    "0x0805D256"
+   ],
+   "ram": [
+    "0xC01ECF00",
+    "0xC01ECF48"
+   ],
+   "hooks": [
+    "0x08035618",
+    "0x0801A7E8"
+   ]
+  },
+  {
+   "model": "chroma",
+   "image": "keysteppro_main_chroma__fw2_5_20_375__2024_03_04.bin",
+   "sha256": "cfc18db3e7f2c54ad0b123a3a8efc6adf75ddaef9789230ad8e0285585fe6616",
+   "writes": [
+    {
+     "at": "0x0805D900",
+     "bytes": "10b582b0049c00944cf6447cccf21e0ca5248cf80040bcf7a5ff4cf6447cccf21e0c00248cf8004002b010bd4cf60071ccf21e010a6844f24943c4f649539a4209d00b604cf60471ccf21e0100224023043bca50fcd107f00f004cf60471ccf21e0101eb80014cf64472ccf21e021278a52a0dd1cb78a52b0ad10b78ab4207d14b78b34204d18b78a34201d1bcf7b0bf0d704e708c70a523cb704af6dc18c0f60108d8f80080bcf7cfbf"
+    },
+    {
+     "at": "0x08035C44",
+     "bytes": "27f05cfe"
+    },
+    {
+     "at": "0x0801A944",
+     "bytes": "42f0f2bf"
+    }
+   ],
+   "flash": [
+    "0x0805D900",
+    "0x0805D9AA"
+   ],
+   "ram": [
+    "0xC01ECF00",
+    "0xC01ECF48"
+   ],
+   "hooks": [
+    "0x08035C44",
+    "0x0801A944"
+   ]
+  }
+ ]
+}
