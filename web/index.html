@@ -76,6 +76,11 @@
          overflow-wrap: anywhere; }
   .hint { color: var(--muted); font-size: 13px; margin: 10px 2px 0; }
   .status { margin-top: 10px; font-weight: 500; }
+  .risk { border: 1px solid var(--bad); border-left-width: 5px; border-radius: 8px; padding: 12px 16px; margin: 18px 0 8px;
+          font-size: 14px; line-height: 1.5; }
+  .risk b { color: var(--bad); }
+  .agree { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 14px; font-size: 14px; line-height: 1.45; cursor: pointer; }
+  .agree input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--accent); flex: none; }
   .status.good { color: var(--good); } .status.bad { color: var(--bad); }
   button { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; padding: 12px 22px;
            font: inherit; font-weight: 650; cursor: pointer; }
@@ -103,6 +108,10 @@
   <p class="sub">New tricks for your KeyStep Pro. Pick the mods you want, drop in the official firmware file, and flash
     the result with MIDI Control Center like any update. Everything happens in this browser.
     <a href="https://github.com/yonie/keystep-mods#readme">The guide</a> explains every mod, flashing, and going back.</p>
+  <div class="risk"><b>At your own risk.</b> These mods are unofficial changes to the KeyStep Pro firmware, not made,
+    checked or supported by Arturia. You flash them entirely at your own risk and responsibility. They come as they
+    are, without warranty of any kind, and the author is not liable for any damage, data loss or malfunction of your
+    instrument. Flashing the official update puts the original firmware back.</div>
 
   <section>
     <h2><span class="n">1</span>Pick your mods</h2>
@@ -121,6 +130,8 @@
   <section>
     <h2><span class="n">3</span>Get your update</h2>
     <div class="box">
+      <label class="agree"><input type="checkbox" id="agree"> I understand that I flash this modified firmware at my own
+        risk, and that the author is not responsible for any damage to my instrument.</label>
       <button id="build" disabled>Build my update</button>
       <div id="result" class="status"></div>
     </div>
@@ -305,7 +316,8 @@
     const names = Array.from(list.querySelectorAll('input:checked'), i => i.value);
     return bundles.filter(b => names.includes(b.name));
   }
-  function refresh() { $('build').disabled = !(stockBytes && chosen().length); }
+  function refresh() { $('build').disabled = !(stockBytes && chosen().length && $('agree').checked); }
+  $('agree').addEventListener('change', refresh);
   function say(e, text, cls) { e.textContent = text; e.className = 'status ' + (cls || ''); }
 
   async function load(file) {

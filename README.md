@@ -6,6 +6,12 @@ other update. Flashing the stock update puts the original firmware back.
 
 **[Open the patcher](https://yonie.github.io/keystep-mods/)** to see the mods in action and build your update.
 
+> [!WARNING]
+> **At your own risk.** These mods are unofficial changes to the KeyStep Pro firmware, not made, checked or supported
+> by Arturia. You flash them entirely at your own risk and responsibility. They come as they are, without warranty of
+> any kind, and the author is not liable for any damage, data loss or malfunction of your instrument. Flashing the
+> official update puts the original firmware back.
+
 ## The mods
 
 **`generative`**: Generative tracks. Flux on Tracks 2 to 4, a melody loop that keeps changing; Pulse on Track 1,
