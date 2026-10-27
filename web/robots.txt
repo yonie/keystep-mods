@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://yonie.github.io/keystep-mods/sitemap.xml
