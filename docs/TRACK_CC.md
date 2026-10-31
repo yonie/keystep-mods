@@ -38,10 +38,15 @@ branches back to the `beq`:
   `0x4B + track`, or `0x4F` when that track is Track 1 in Drum mode. It ends with `cmp r4, #0x7F`, so the `beq`
   takes the stock Global fallback only when nothing was changed.
 * Only `r0`-`r3` are used (the code returned to reloads them before use); `lr` is saved around the call.
-* CC number, Port, Min and Max are read by the stock code as before. Nothing is drawn differently.
+* CC number, Port, Min and Max are read by the stock code as before.
+* **The word.** The knob Channel setting draws its value from a table of string pointers of its own (`0x08059F10`:
+  1..16, then Global at `0x08059F50`; Chroma `0x0805A5D4` / `0x0805A614`). The third hook writes that one entry
+  to point at the stub's `"Track"`, so the setting reads `Channel : Track`. The Global MIDI chan setting has its own
+  strings and keeps them.
 
 Mechanics:
 
-1. Hooks at `0x08012B18` (knob up) and `0x08013FE4` (knob down), each `b.w` to its stub.
-2. The stubs (124 bytes) go at `0x08060000`, after the `generative` mod's slot (`patches/free_space.json`).
+1. Hooks at `0x08012B18` (knob up) and `0x08013FE4` (knob down), each `b.w` to its stub, and the `Global` entry
+   of the knob Channel names at `0x08059F50`.
+2. The stubs and the word (130 bytes) go at `0x08060000`, after the `generative` mod's slot (`patches/free_space.json`).
 3. No RAM: the mod keeps no state.

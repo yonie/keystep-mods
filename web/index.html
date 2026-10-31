@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>KeyStep Pro Mods: free firmware mods for the Arturia KeyStep Pro</title>
-<meta name="description" content="Free firmware mods for the Arturia KeyStep Pro and KeyStep Pro Chroma: generative tracks (Flux melodies, Pulse Euclidean drums) and clean pattern switches. Build the patched update in your browser, flash it with MIDI Control Center.">
+<meta name="description" content="Free firmware mods for the Arturia KeyStep Pro and KeyStep Pro Chroma: generative tracks (Flux melodies, Pulse Euclidean drums), clean pattern switches and Control-mode knobs that follow the track. Build the patched update in your browser, flash it with MIDI Control Center.">
 <link rel="canonical" href="https://yonie.github.io/keystep-mods/">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="KeyStep Pro Mods">
 <meta property="og:title" content="KeyStep Pro Mods: free firmware mods for the KeyStep Pro">
-<meta property="og:description" content="Free firmware mods for the Arturia KeyStep Pro and KeyStep Pro Chroma: generative tracks (Flux melodies, Pulse Euclidean drums) and clean pattern switches. Build the patched update in your browser, flash it with MIDI Control Center.">
+<meta property="og:description" content="Free firmware mods for the Arturia KeyStep Pro and KeyStep Pro Chroma: generative tracks (Flux melodies, Pulse Euclidean drums), clean pattern switches and Control-mode knobs that follow the track. Build the patched update in your browser, flash it with MIDI Control Center.">
 <meta property="og:url" content="https://yonie.github.io/keystep-mods/">
 <meta property="og:image" content="https://yonie.github.io/keystep-mods/og.png">
 <meta property="og:image:width" content="1200">
@@ -20,12 +20,12 @@
 <meta property="og:image:alt" content="KeyStep Pro Mods: Flux and Pulse, generative tracks">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="KeyStep Pro Mods: free firmware mods for the KeyStep Pro">
-<meta name="twitter:description" content="Free firmware mods for the Arturia KeyStep Pro and KeyStep Pro Chroma: generative tracks (Flux melodies, Pulse Euclidean drums) and clean pattern switches. Build the patched update in your browser, flash it with MIDI Control Center.">
+<meta name="twitter:description" content="Free firmware mods for the Arturia KeyStep Pro and KeyStep Pro Chroma: generative tracks (Flux melodies, Pulse Euclidean drums), clean pattern switches and Control-mode knobs that follow the track. Build the patched update in your browser, flash it with MIDI Control Center.">
 <meta name="twitter:image" content="https://yonie.github.io/keystep-mods/og.png">
 <script type="application/ld+json">
 {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "KeyStep Pro Mods",
   "applicationCategory": "MultimediaApplication", "operatingSystem": "Web browser",
-  "url": "https://yonie.github.io/keystep-mods/", "description": "Free firmware mods for the Arturia KeyStep Pro and KeyStep Pro Chroma: generative tracks (Flux melodies, Pulse Euclidean drums) and clean pattern switches. Build the patched update in your browser, flash it with MIDI Control Center.",
+  "url": "https://yonie.github.io/keystep-mods/", "description": "Free firmware mods for the Arturia KeyStep Pro and KeyStep Pro Chroma: generative tracks (Flux melodies, Pulse Euclidean drums), clean pattern switches and Control-mode knobs that follow the track. Build the patched update in your browser, flash it with MIDI Control Center.",
   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
   "license": "https://opensource.org/licenses/MIT", "codeRepository": "https://github.com/yonie/keystep-mods"}
 </script>
@@ -265,32 +265,37 @@
     ticks.push(() => { lanes.forEach(l => { l.pos = (l.pos + 1) % l.n; }); draw(); });
   }
 
-  function midiVisual(parent) {                      // four pattern switches: stock re-sends the sound each time
+  function midiVisual(parent) {                      // Play, then four switches: stock never sends on Play, then always
     const m = mini('', null, parent);
     m.classList.add('wide');
     m.querySelector('.top').remove();
-    const W = 420, H = 150, X0 = 92, BAR = 78;
+    const W = 420, H = 150, X0 = 92, BAR = 64, N = 5;
     const s = el('svg', { class: 'midi', viewBox: `0 0 ${W} ${H}` }, m, true);
-    const rows = [{ y: 44, label: 'STOCK', every: true }, { y: 104, label: 'WITH MOD', every: false }];
+    // column 0 is Play after power-on, 1..4 pattern switches to the same sound
+    const rows = [{ y: 44, label: 'STOCK', sends: b => b > 0 }, { y: 104, label: 'WITH MOD', sends: b => b === 0 }];
     const notes = [];
     rows.forEach(r => {
       el('text', { x: 0, y: r.y + 3 }, s, true).textContent = r.label;
       el('line', { x1: X0 - 6, y1: r.y, x2: W - 4, y2: r.y, stroke: '#262b33' }, s, true);
-      for (let b = 0; b < 4; b++) {
+      for (let b = 0; b < N; b++) {
         const x = X0 + b * BAR;
-        el('line', { x1: x, y1: r.y - 20, x2: x, y2: r.y + 14, stroke: '#3a414b', 'stroke-dasharray': '2 2' }, s, true);
-        const sends = r.every || b === 0;
+        el('line', { x1: x, y1: r.y - 20, x2: x, y2: r.y + 14, stroke: b ? '#3a414b' : '#8a939e', 'stroke-dasharray': '2 2' }, s, true);
+        const sends = r.sends(b);
         if (sends) for (let j = 0; j < 3; j++)                              // Bank MSB, Bank LSB, Program Change
           el('rect', { x: x + 1 + j * 7, y: r.y - 17, width: 5, height: 10, rx: 1.5, fill: '#e0675a' }, s, true);
         const late = sends ? 18 : 0;                                      // the synth is busy loading the sound
-        const n = el('circle', { cx: x + 4 + late, cy: r.y + 4, r: 5.5, fill: late ? '#e0675a' : '#2fd8c2', opacity: .5 }, s, true);
+        const wrong = b === 0 && !sends;                                  // stock: the synth's own sound after power-on
+        const n = el('circle', { cx: x + 4 + late, cy: r.y + 4, r: 5.5,
+                                 fill: wrong ? '#8a939e' : late ? '#e0675a' : '#2fd8c2', opacity: .5 }, s, true);
         notes.push({ n, x: x + 4 + late });
       }
     });
-    el('text', { x: X0 + 1, y: 14 }, s, true).textContent = 'PATTERN SWITCHES';
-    const legend = [['#e0675a', 'rect', 'SOUND RELOAD'], ['#e0675a', 'circle', 'LATE NOTE'], ['#2fd8c2', 'circle', 'ON TIME']];
+    el('text', { x: X0 + 1, y: 14 }, s, true).textContent = 'PLAY';
+    el('text', { x: X0 + BAR + 1, y: 14 }, s, true).textContent = 'PATTERN SWITCHES';
+    const legend = [['#e0675a', 'rect', 'SOUND LOAD'], ['#e0675a', 'circle', 'LATE'], ['#2fd8c2', 'circle', 'ON TIME'],
+                    ['#8a939e', 'circle', 'WRONG SOUND']];
     legend.forEach(([c, shape, txt], i) => {
-      const lx = X0 + i * 108, ly = H - 8;
+      const lx = [X0 - 6, 180, 234, 304][i], ly = H - 8;
       if (shape === 'rect') el('rect', { x: lx, y: ly - 7, width: 5, height: 8, rx: 1.5, fill: c }, s, true);
       else el('circle', { cx: lx + 3, cy: ly - 3, r: 4, fill: c }, s, true);
       el('text', { x: lx + 11, y: ly }, s, true).textContent = txt;
@@ -298,14 +303,74 @@
     const cur = el('line', { x1: X0, y1: 20, x2: X0, y2: H - 22, stroke: '#ffffff', 'stroke-width': 1, opacity: .6 }, s, true);
     let t = 0;
     ticks.push(() => {
-      t = (t + 8) % (4 * BAR + 24);
+      t = (t + 8) % (N * BAR + 24);
       const x = X0 + t;
       cur.setAttribute('x1', x); cur.setAttribute('x2', x);
       notes.forEach(o => o.n.setAttribute('opacity', x >= o.x - 4 && x < o.x + 16 ? 1 : .5));
     });
   }
 
-  const VISUALS = { generative: v => { fluxVisual(v); pulseVisual(v); }, 'filter-midicc': midiVisual };
+  function ccVisual(parent) {                        // Control mode: the knobs follow the track it was entered from
+    const m = mini('', null, parent);
+    m.classList.add('wide');
+    m.querySelector('.top').remove();
+    const W = 420, H = 176, X0 = 92, DX = W - 58;
+    const s = el('svg', { class: 'midi', viewBox: `0 0 ${W} ${H}` }, m, true);
+    const CH = [5, 3, 7, 12], SEQ = [1, 3, 0];          // each track's MIDI channel; the tracks Control is entered from
+    const TEAL = '#2fd8c2', RED = '#e0675a';
+    el('text', { x: X0 - 8, y: 14 }, s, true).textContent = 'CONTROL MODE ENTERED FROM';
+    const chips = CH.map((ch, i) => {
+      const x = X0 - 8 + i * 52;
+      const r = el('rect', { x, y: 22, width: 40, height: 18, rx: 4, fill: '#1d2228', stroke: '#3a414b' }, s, true);
+      const lab = el('text', { x: x + 20, y: 34, 'text-anchor': 'middle' }, s, true);
+      lab.textContent = 'TRACK ' + (i + 1);
+      lab.setAttribute('textLength', 32);
+      el('text', { x: x + 20, y: 54, 'text-anchor': 'middle' }, s, true).textContent = 'CH ' + ch;
+      return { r, lab };
+    });
+    const rows = [{ y: 90, label: 'STOCK' }, { y: 136, label: 'WITH MOD' }].map(r => {
+      el('text', { x: 0, y: r.y + 3 }, s, true).textContent = r.label;
+      el('line', { x1: X0 + 14, y1: r.y, x2: DX - 6, y2: r.y, stroke: '#262b33' }, s, true);
+      el('circle', { cx: X0, cy: r.y, r: 10, fill: '#1d2228', stroke: '#8a939e', 'stroke-width': 1.5 }, s, true);
+      const ptr = el('line', { x1: X0, y1: r.y, x2: X0, y2: r.y - 8, stroke: '#e8eef4', 'stroke-width': 2,
+                               'stroke-linecap': 'round' }, s, true);
+      el('text', { x: X0 + 18, y: r.y - 8 }, s, true).textContent = 'CC 74';
+      const box = el('rect', { x: DX, y: r.y - 11, width: 52, height: 22, rx: 5, fill: 'none', 'stroke-width': 1.5 }, s, true);
+      const dst = el('text', { x: DX + 26, y: r.y + 3, 'text-anchor': 'middle' }, s, true);
+      const dots = [0, 1, 2].map(() => el('rect', { y: r.y - 4, width: 7, height: 8, rx: 1.5 }, s, true));
+      return { y: r.y, ptr, box, dst, dots };
+    });
+    const legend = [[TEAL, "REACHES THE TRACK'S SYNTH"], [RED, 'THE GLOBAL CHANNEL']];
+    legend.forEach(([c, txt], i) => {
+      const lx = X0 - 8 + i * 172, ly = H - 6;
+      el('rect', { x: lx, y: ly - 7, width: 7, height: 8, rx: 1.5, fill: c }, s, true);
+      el('text', { x: lx + 13, y: ly }, s, true).textContent = txt;
+    });
+    let t = 0;
+    ticks.push(() => {
+      t++;
+      const a = SEQ[Math.floor(t / 14) % SEQ.length], blink = t % 4 < 2;
+      chips.forEach((c, i) => {
+        const on = i === a;
+        c.r.setAttribute('fill', on && blink ? TEAL : '#1d2228');
+        c.r.setAttribute('stroke', on ? TEAL : '#3a414b');
+        c.lab.style.fill = on && blink ? '#15181d' : '';
+      });
+      const ang = Math.sin(t / 3) * 2.2, span = DX - X0 - 30;
+      rows.forEach((r, j) => {
+        const ch = j ? CH[a] : 1, col = ch === CH[a] ? TEAL : RED;   // stock: the Global MIDI channel, 1
+        r.ptr.setAttribute('x2', X0 + 8 * Math.sin(ang));
+        r.ptr.setAttribute('y2', r.y - 8 * Math.cos(ang));
+        r.dst.textContent = 'CH ' + ch;
+        r.dst.style.fill = col;
+        r.box.setAttribute('stroke', col);
+        r.dots.forEach((d, i) => { d.setAttribute('x', X0 + 16 + (t * 9 + i * span / 3) % span); d.setAttribute('fill', col); });
+      });
+    });
+  }
+
+  const VISUALS = { generative: v => { fluxVisual(v); pulseVisual(v); }, 'filter-midicc': midiVisual,
+                    'track-cc': ccVisual };
   const GUIDE = { generative: '#generative-tracks-the-generative-mod',
                   'filter-midicc': '#clean-pattern-switches-the-filter-midicc-mod',
                   'track-cc': '#knobs-follow-the-track-the-track-cc-mod' };

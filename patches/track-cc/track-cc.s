@@ -64,3 +64,9 @@ chan:
 keep:
     cmp     r4, #0x7F
     bx      lr
+
+@ ---- the word the knob's Channel setting shows instead of "Global" (Utility > Controller > Knob N > Channel) -----
+@ The setting's value names are a table of string pointers of their own (1..16, then Global); the hook repoints
+@ only its Global entry, so the Global MIDI channel and every other menu keep their text.
+name_track:
+    .byte   0x54, 0x72, 0x61, 0x63, 0x6B, 0     @ "Track"

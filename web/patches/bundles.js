@@ -271,7 +271,7 @@ window.KSP_PATCHES = [
  {
   "name": "track-cc",
   "title": "Knobs follow the track",
-  "pitch": "In Control mode the five knobs send their CCs on the MIDI channel of the track you came from, so they reach the synth that track plays.",
+  "pitch": "In Control mode the five knobs send their CCs on the MIDI channel of the track you came from, so they reach the synth that track plays. The knob's Global channel setting becomes Track.",
   "description": "In Control mode, knobs on the Global channel send on the MIDI channel of the track Control mode was entered from",
   "firmware": {
    "version": "2.5.20"
@@ -284,7 +284,7 @@ window.KSP_PATCHES = [
     "writes": [
      {
       "at": "0x08060000",
-      "bytes": "02b500f00bf8bde80240b2f787bd02b500f004f8bde80240b3f7e6bf1c797f2c2ad140f2a410c2f200000078042823d144f6b751c2f20001097803291cd811f14b0289b904b541f29840c2f20000006844f6ad52c2f2000212780021cbf77efabde8044000b14f2240f67400c2f200008018047904f00f047f2c7047"
+      "bytes": "02b500f00bf8bde80240b2f787bd02b500f004f8bde80240b3f7e6bf1c797f2c2ad140f2a410c2f200000078042823d144f6b751c2f20001097803291cd811f14b0289b904b541f29840c2f20000006844f6ad52c2f2000212780021cbf77efabde8044000b14f2240f67400c2f200008018047904f00f047f2c7047547261636b00"
      },
      {
       "at": "0x08012B18",
@@ -293,11 +293,15 @@ window.KSP_PATCHES = [
      {
       "at": "0x08013FE4",
       "bytes": "4cf013b8"
+     },
+     {
+      "at": "0x08059F50",
+      "bytes": "7c000608"
      }
     ],
     "flash": [
      "0x08060000",
-     "0x0806007C"
+     "0x08060082"
     ],
     "ram": [
      "0x00000000",
@@ -305,7 +309,8 @@ window.KSP_PATCHES = [
     ],
     "hooks": [
      "0x08012B18",
-     "0x08013FE4"
+     "0x08013FE4",
+     "0x08059F50"
     ]
    },
    {
@@ -315,7 +320,7 @@ window.KSP_PATCHES = [
     "writes": [
      {
       "at": "0x08060800",
-      "bytes": "02b500f00bf8bde80240b2f791ba02b500f004f8bde80240b3f7f0bc1c797f2c2ad140f2a810c2f200000078042823d144f6d751c2f20001097803291cd811f14b0289b904b541f29c40c2f20000006844f6cd52c2f2000212780021cbf710f9bde8044000b14f2240f67800c2f200008018047904f00f047f2c7047"
+      "bytes": "02b500f00bf8bde80240b2f791ba02b500f004f8bde80240b3f7f0bc1c797f2c2ad140f2a810c2f200000078042823d144f6d751c2f20001097803291cd811f14b0289b904b541f29c40c2f20000006844f6cd52c2f2000212780021cbf710f9bde8044000b14f2240f67800c2f200008018047904f00f047f2c7047547261636b00"
      },
      {
       "at": "0x08012D2C",
@@ -324,11 +329,15 @@ window.KSP_PATCHES = [
      {
       "at": "0x080141F8",
       "bytes": "4cf009bb"
+     },
+     {
+      "at": "0x0805A614",
+      "bytes": "7c080608"
      }
     ],
     "flash": [
      "0x08060800",
-     "0x0806087C"
+     "0x08060882"
     ],
     "ram": [
      "0x00000000",
@@ -336,7 +345,8 @@ window.KSP_PATCHES = [
     ],
     "hooks": [
      "0x08012D2C",
-     "0x080141F8"
+     "0x080141F8",
+     "0x0805A614"
     ]
    }
   ]

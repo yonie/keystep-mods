@@ -1,7 +1,7 @@
 {
   "name": "track-cc",
   "title": "Knobs follow the track",
-  "pitch": "In Control mode the five knobs send their CCs on the MIDI channel of the track you came from, so they reach the synth that track plays.",
+  "pitch": "In Control mode the five knobs send their CCs on the MIDI channel of the track you came from, so they reach the synth that track plays. The knob's Global channel setting becomes Track.",
   "description": "In Control mode, knobs on the Global channel send on the MIDI channel of the track Control mode was entered from",
   "firmware": {
     "version": "2.5.20"
@@ -57,6 +57,14 @@
       },
       "asm": "b.w knob_down",
       "what": "the encoder handler FUN_08012338, a knob turned down in Control mode: its Channel setting is read"
+    },
+    {
+      "at": {
+        "standard": "0x08059F50",
+        "chroma": "0x0805A614"
+      },
+      "asm": ".word name_track",
+      "what": "the knob Channel setting's value names: its Global entry shows the stub's word"
     }
   ]
 }

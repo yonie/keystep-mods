@@ -21,12 +21,15 @@ drum pulses spread evenly over each drum lane's steps ([below](#generative-track
 
 **`filter-midicc`**: Clean pattern switches. A pattern switch no longer re-sends Bank MSB, Bank LSB and Program
 Change when that MIDI channel already has them, so the first note after a switch is no longer late on synths that
-reload their sound on every program change ([below](#clean-pattern-switches-the-filter-midicc-mod)).
+reload their sound on every program change. Play sends each track's sound, so the synth is right from the first
+note after power-on ([below](#clean-pattern-switches-the-filter-midicc-mod)).
 
-<img src="docs/img/clean_switches.gif" width="520" alt="Pattern switches: stock re-sends the sound and the note is late; with the mod it is on time">
+<img src="docs/img/clean_switches.gif" width="520" alt="Play, then pattern switches: stock sends no sound on Play and re-sends it on every switch; with the mod Play sends it once and the switches are on time">
 
 **`track-cc`**: Knobs follow the track. In Control mode the five knobs send their CCs on the MIDI channel of the
 track you came from, so they reach the synth that track plays ([below](#knobs-follow-the-track-the-track-cc-mod)).
+
+<img src="docs/img/track_cc.gif" width="520" alt="Knobs follow the track: stock sends the knob CCs on channel 1 whatever track Control mode came from; with the mod they go to that track's channel">
 
 Mods combine: tick several and they go into one update. `generative` and `filter-midicc` have been flashed to a real
 KeyStep Pro, and Generative tracks has been played on it; `track-cc` has not been on a real unit yet.
@@ -220,7 +223,7 @@ syncs and copies, and generative mode keeps out of it. If a loop is worth keepin
 
 ## Clean pattern switches (the `filter-midicc` mod)
 
-<img src="docs/img/clean_switches.gif" width="520" alt="Four pattern switches compared: stock reloads the sound on every switch and each note after it comes late; with the mod only the first switch reloads it and the other notes play on time">
+<img src="docs/img/clean_switches.gif" width="520" alt="Play and four pattern switches compared: stock plays the synth's own sound after power-on and then reloads the sound on every switch, each note late; with the mod Play loads the sound once and every switch plays on time">
 
 A pattern can send a Program Change with its Bank MSB and LSB when it starts (`Shift + Track > PC Assign`). The
 stock firmware sends all three on every pattern switch, even when the new pattern's values are the same as the old
@@ -243,19 +246,22 @@ The mod only affects Bank Select and Program Change sent on a pattern switch. No
 
 ## Knobs follow the track (the `track-cc` mod)
 
+<img src="docs/img/track_cc.gif" width="520" alt="Control mode entered from Track 2, 4 and 1 in turn: stock sends the knob CC on channel 1 every time, with the mod it goes to channel 3, 12 and 5">
+
 Press Control and the five knobs above the step buttons send MIDI CCs (CC 74 to 78 unless you changed them in
 `Utility > Controller > Knob 1..5`). Stock, every knob left on its default channel, Global, sends on the Global MIDI
 channel (`Utility > Controller > Global MIDI chan`, channel 1 out of the box), whichever track you were on.
 
-With `track-cc` those knobs send on the MIDI Channel OUT of the track you entered Control mode from: the track whose
-button blinks while Control is on. Select Track 2, press Control, and the knobs reach the synth Track 2 plays, say a
-JV-1010 on channel 3, to sweep its cutoff and resonance. Select another track, press Control again, and the knobs
-follow that track's channel. Track 1 in Drum mode uses its Drum Output channel.
+With `track-cc` that default is called **Track**, and it means the MIDI Channel OUT of the track you entered Control
+mode from: the track whose button blinks while Control is on. Select Track 2, press Control, and the knobs reach the
+synth Track 2 plays, say a JV-1010 on channel 3, to sweep its cutoff and resonance. Select another track, press
+Control again, and the knobs follow that track's channel. Track 1 in Drum mode uses its Drum Output channel.
 
 - **CC numbers, Port, Min and Max** stay as set per knob.
-- **A knob set to its own channel** (1 to 16 instead of Global, in `Utility > Controller > Knob N > Channel`) keeps
+- **A knob set to its own channel** (1 to 16 instead of Track, in `Utility > Controller > Knob N > Channel`) keeps
   sending there. Use that for a knob that should always reach one synth.
-- **Outside Control mode** nothing changes, and the screen shows exactly what it does stock.
+- **Outside Control mode** nothing changes. The only thing on screen that differs from stock is that word: the knob's
+  Channel setting shows `Track` where it showed `Global`. The Global MIDI chan setting itself is untouched.
 
 Looking for more cool stuff? I also release open source audio VST plugins as [WET VST](https://wetvst.com).
 
