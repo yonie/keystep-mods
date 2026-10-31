@@ -30,6 +30,9 @@
       },
       "generative (UI)": {
         "flash": "0x0802F010..0x0802F100"
+      },
+      "track-cc": {
+        "flash": "0x08060000..0x08060100"
       }
     },
     "chroma": {
@@ -43,6 +46,9 @@
       },
       "generative (UI)": {
         "flash": "0x0802F010..0x0802F100"
+      },
+      "track-cc": {
+        "flash": "0x08060800..0x08060900"
       }
     }
   },

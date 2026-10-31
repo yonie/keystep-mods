@@ -25,8 +25,11 @@ reload their sound on every program change ([below](#clean-pattern-switches-the-
 
 <img src="docs/img/clean_switches.gif" width="520" alt="Pattern switches: stock re-sends the sound and the note is late; with the mod it is on time">
 
-Mods combine: tick several and they go into one update. Both mods have been flashed to a real KeyStep Pro, and
-Generative tracks has been played on it.
+**`track-cc`**: Knobs follow the track. In Control mode the five knobs send their CCs on the MIDI channel of the
+track you came from, so they reach the synth that track plays ([below](#knobs-follow-the-track-the-track-cc-mod)).
+
+Mods combine: tick several and they go into one update. `generative` and `filter-midicc` have been flashed to a real
+KeyStep Pro, and Generative tracks has been played on it; `track-cc` has not been on a real unit yet.
 
 They only work on KeyStep Pro firmware **2.5.20**, on both the standard KeyStep Pro and the KeyStep Pro Chroma.
 The page checks that your file is the untouched 2.5.20 update before it changes anything. If MIDI Control Center
@@ -238,6 +241,22 @@ again. Switch to a pattern with another program, or flash the stock update, to g
 
 The mod only affects Bank Select and Program Change sent on a pattern switch. Nothing else changes.
 
+## Knobs follow the track (the `track-cc` mod)
+
+Press Control and the five knobs above the step buttons send MIDI CCs (CC 74 to 78 unless you changed them in
+`Utility > Controller > Knob 1..5`). Stock, every knob left on its default channel, Global, sends on the Global MIDI
+channel (`Utility > Controller > Global MIDI chan`, channel 1 out of the box), whichever track you were on.
+
+With `track-cc` those knobs send on the MIDI Channel OUT of the track you entered Control mode from: the track whose
+button blinks while Control is on. Select Track 2, press Control, and the knobs reach the synth Track 2 plays, say a
+JV-1010 on channel 3, to sweep its cutoff and resonance. Select another track, press Control again, and the knobs
+follow that track's channel. Track 1 in Drum mode uses its Drum Output channel.
+
+- **CC numbers, Port, Min and Max** stay as set per knob.
+- **A knob set to its own channel** (1 to 16 instead of Global, in `Utility > Controller > Knob N > Channel`) keeps
+  sending there. Use that for a knob that should always reach one synth.
+- **Outside Control mode** nothing changes, and the screen shows exactly what it does stock.
+
 Looking for more cool stuff? I also release open source audio VST plugins as [WET VST](https://wetvst.com).
 
 ## For developers
@@ -269,7 +288,7 @@ patcher's copy (`web/patches/`).
 
 - `web/` - the patcher page (`index.html`, `kspatch.js`) and the exported mods (`patches/`).
 - `patches/` - `make_patch.py`, the free flash and RAM, and one folder per mod.
-- `docs/` - how each mod hooks the firmware: `docs/GENERATIVE.md`, `docs/FILTER_MIDICC.md`.
+- `docs/` - how each mod hooks the firmware: `docs/GENERATIVE.md`, `docs/FILTER_MIDICC.md`, `docs/TRACK_CC.md`.
 
 ## Licence
 
