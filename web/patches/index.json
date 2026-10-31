@@ -12,7 +12,7 @@
   },
   {
    "name": "track-cc",
-   "description": "In Control mode, knobs on the Global channel send on the MIDI channel of the track Control mode was entered from",
+   "description": "In Control mode, knobs whose Channel is set to Track send on the MIDI channel of the track Control mode was entered from",
    "file": "track-cc.json"
   }
  ]

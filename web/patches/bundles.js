@@ -301,8 +301,8 @@ window.KSP_PATCHES = [
  {
   "name": "track-cc",
   "title": "Control mode follows selected track",
-  "pitch": "In Control mode the five knobs send their CCs on the MIDI channel of the track you came from, so they reach the synth that track plays. The knob's Global channel setting becomes Track.",
-  "description": "In Control mode, knobs on the Global channel send on the MIDI channel of the track Control mode was entered from",
+  "pitch": "In Control mode the knobs can send their CCs on the MIDI channel of the track you came from, so they reach the synth that track plays. Each knob's Channel setting gets a new choice, Track, next to 1 to 16 and Global.",
+  "description": "In Control mode, knobs whose Channel is set to Track send on the MIDI channel of the track Control mode was entered from",
   "firmware": {
    "version": "2.5.20"
   },
@@ -314,24 +314,36 @@ window.KSP_PATCHES = [
     "writes": [
      {
       "at": "0x08060000",
-      "bytes": "02b500f00bf8bde80240b2f787bd02b500f004f8bde80240b3f7e6bf1c797f2c2ad140f2a410c2f200000078042823d144f6b751c2f20001097803291cd811f14b0289b904b541f29840c2f20000006844f6ad52c2f2000212780021cbf77efabde8044000b14f2240f67400c2f200008018047904f00f047f2c7047547261636b00"
+      "bytes": "5c9505086c9505087c9505088c9505089c950508ac950508bc950508cc950508dc950508ec950508fc9505080c9605081c9605082c9605083c9605084c960508b4b50508ea0006080f2802d97e2802d11120c2f7a8b9c2f7a0b90f2a02d9112a02d17e22c3f7fbbcc3f7f6bc02b500f00bf8bde80240b2f751bd02b500f004f8bde80240b3f7b0bf1c797e2c2bd17f2440f2a410c2f200000078042823d144f6b751c2f20001097803291cd811f14b0289b904b541f29840c2f20000006844f6ad52c2f2000212780021cbf747fabde8044000b14f2240f67400c2f200008018047904f00f047f2c7047547261636b00"
      },
      {
       "at": "0x08012B18",
-      "bytes": "4df072ba"
+      "bytes": "4df0a8ba"
      },
      {
       "at": "0x08013FE4",
-      "bytes": "4cf013b8"
+      "bytes": "4cf049b8"
      },
      {
-      "at": "0x08059F50",
-      "bytes": "7c000608"
+      "at": "0x08022396",
+      "bytes": "3df057be"
+     },
+     {
+      "at": "0x08023A54",
+      "bytes": "3cf001bb"
+     },
+     {
+      "at": "0x08058B68",
+      "bytes": "00000608"
+     },
+     {
+      "at": "0x08058B6C",
+      "bytes": "12000000"
      }
     ],
     "flash": [
      "0x08060000",
-     "0x08060082"
+     "0x080600F0"
     ],
     "ram": [
      "0x00000000",
@@ -340,7 +352,10 @@ window.KSP_PATCHES = [
     "hooks": [
      "0x08012B18",
      "0x08013FE4",
-     "0x08059F50"
+     "0x08022396",
+     "0x08023A54",
+     "0x08058B68",
+     "0x08058B6C"
     ]
    },
    {
@@ -350,24 +365,36 @@ window.KSP_PATCHES = [
     "writes": [
      {
       "at": "0x08060800",
-      "bytes": "02b500f00bf8bde80240b2f791ba02b500f004f8bde80240b3f7f0bc1c797f2c2ad140f2a810c2f200000078042823d144f6d751c2f20001097803291cd811f14b0289b904b541f29c40c2f20000006844f6cd52c2f2000212780021cbf710f9bde8044000b14f2240f67800c2f200008018047904f00f047f2c7047547261636b00"
+      "bytes": "209c0508309c0508409c0508509c0508609c0508709c0508809c0508909c0508a09c0508b09c0508c09c0508d09c0508e09c0508f09c0508009d0508109d050888bc0508ea0806080f2802d97e2802d11120c1f76ebec1f766be0f2a02d9112a02d17e22c3f74fbac3f74aba02b500f00bf8bde80240b2f75bba02b500f004f8bde80240b3f7babc1c797e2c2bd17f2440f2a810c2f200000078042823d144f6d751c2f20001097803291cd811f14b0289b904b541f29c40c2f20000006844f6cd52c2f2000212780021cbf7d9f8bde8044000b14f2240f67800c2f200008018047904f00f047f2c7047547261636b00"
      },
      {
       "at": "0x08012D2C",
-      "bytes": "4df068bd"
+      "bytes": "4df09ebd"
      },
      {
       "at": "0x080141F8",
-      "bytes": "4cf009bb"
+      "bytes": "4cf03fbb"
      },
      {
-      "at": "0x0805A614",
-      "bytes": "7c080608"
+      "at": "0x08022522",
+      "bytes": "3ef091b9"
+     },
+     {
+      "at": "0x08023CFC",
+      "bytes": "3cf0adbd"
+     },
+     {
+      "at": "0x08059220",
+      "bytes": "00080608"
+     },
+     {
+      "at": "0x08059224",
+      "bytes": "12000000"
      }
     ],
     "flash": [
      "0x08060800",
-     "0x08060882"
+     "0x080608F0"
     ],
     "ram": [
      "0x00000000",
@@ -376,7 +403,10 @@ window.KSP_PATCHES = [
     "hooks": [
      "0x08012D2C",
      "0x080141F8",
-     "0x0805A614"
+     "0x08022522",
+     "0x08023CFC",
+     "0x08059220",
+     "0x08059224"
     ]
    }
   ]
