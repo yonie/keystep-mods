@@ -1,8 +1,8 @@
 {
   "name": "track-cc",
   "title": "Control mode follows selected track",
-  "pitch": "In Control mode the five knobs send their CCs on the MIDI channel of the track you came from, so they reach the synth that track plays. The knob's Global channel setting becomes Track.",
-  "description": "In Control mode, knobs on the Global channel send on the MIDI channel of the track Control mode was entered from",
+  "pitch": "In Control mode the knobs can send their CCs on the MIDI channel of the track you came from, so they reach the synth that track plays. Each knob's Channel setting gets a new choice, Track, next to 1 to 16 and Global.",
+  "description": "In Control mode, knobs whose Channel is set to Track send on the MIDI channel of the track Control mode was entered from",
   "firmware": {
     "version": "2.5.20"
   },
@@ -21,7 +21,13 @@
         "PROJECT": "0x20004DAD",
         "SEQ": "0x20001498",
         "SETTINGS": "0x20000874",
-        "DRUM": "0x0802B55C"
+        "DRUM": "0x0802B55C",
+        "ENTER_INDEX": "0x080223A6",
+        "ENTER_REST": "0x0802239A",
+        "COMMIT_STORE": "0x08023A5E",
+        "COMMIT_REST": "0x08023A58",
+        "NAME_1": "0x0805955C",
+        "NAME_GLOBAL": "0x0805B5B4"
       }
     },
     "chroma": {
@@ -37,7 +43,13 @@
         "PROJECT": "0x20004DCD",
         "SEQ": "0x2000149C",
         "SETTINGS": "0x20000878",
-        "DRUM": "0x0802BA80"
+        "DRUM": "0x0802BA80",
+        "ENTER_INDEX": "0x08022532",
+        "ENTER_REST": "0x08022526",
+        "COMMIT_STORE": "0x08023D06",
+        "COMMIT_REST": "0x08023D00",
+        "NAME_1": "0x08059C20",
+        "NAME_GLOBAL": "0x0805BC88"
       }
     }
   },
@@ -60,11 +72,35 @@
     },
     {
       "at": {
-        "standard": "0x08059F50",
-        "chroma": "0x0805A614"
+        "standard": "0x08022396",
+        "chroma": "0x08022522"
       },
-      "asm": ".word name_track",
-      "what": "the knob Channel setting's value names: its Global entry shows the stub's word"
+      "asm": "b.w menu_enter",
+      "what": "the knob Channel editor opens: the stored value becomes the list index"
+    },
+    {
+      "at": {
+        "standard": "0x08023A54",
+        "chroma": "0x08023CFC"
+      },
+      "asm": "b.w menu_commit",
+      "what": "the knob Channel editor commits: the list index becomes the stored value"
+    },
+    {
+      "at": {
+        "standard": "0x08058B68",
+        "chroma": "0x08059220"
+      },
+      "asm": ".word names",
+      "what": "the knob Channel menu descriptor: its value names (1..16, Global, Track)"
+    },
+    {
+      "at": {
+        "standard": "0x08058B6C",
+        "chroma": "0x08059224"
+      },
+      "asm": ".word 18",
+      "what": "the knob Channel menu descriptor: its number of values, 17 -> 18"
     }
   ]
 }

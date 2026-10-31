@@ -206,11 +206,13 @@ def assemble_part(name, meta, d, space):
     log = ['%s [%s]: code %d bytes at 0x%08X; RAM %s' % (name, meta['image'], len(code), flash, ram_note)]
     for h in meta['hooks']:
         at, target = int(h['at'], 16), h['asm'].split()[-1]
-        ins = asm(fill(h['asm'].replace(target, '0x%X' % lab[target]), values), at)
+        src = h['asm'].replace(target, '0x%X' % lab[target]) if target in lab else h['asm']   # a label, or a value
+        ins = asm(fill(src, values), at)
         if len(ins) != 4:
             raise SystemExit('hook at 0x%08X assembled to %d bytes' % (at, len(ins)))
         writes.append((at, ins))
-        log.append('  hook 0x%08X: %s -> 0x%08X (%s)' % (at, h['asm'], lab[target], h['what']))
+        log.append('  hook 0x%08X: %s -> %s (%s)' % (at, h['asm'], '0x%08X' % lab[target] if target in lab else
+                                                     src, h['what']))
     return {'image': meta['image'], 'model': meta['model'], 'writes': writes, 'flash': (flash, flash + len(code)),
             'ram': (ram, r) if ram is not None else (0, 0), 'hooks': [int(h['at'], 16) for h in meta['hooks']],
             'log': log}
