@@ -26,10 +26,10 @@ note after power-on ([below](#clean-pattern-switches-the-filter-midicc-mod)).
 
 <img src="docs/img/clean_switches.gif" width="520" alt="Play, then pattern switches: stock sends no sound on Play and re-sends it on every switch; with the mod Play sends it once and the switches are on time">
 
-**`track-cc`**: Knobs follow the track. In Control mode the five knobs send their CCs on the MIDI channel of the
-track you came from, so they reach the synth that track plays ([below](#knobs-follow-the-track-the-track-cc-mod)).
+**`track-cc`**: Control mode follows selected track. In Control mode the five knobs send their CCs on the MIDI channel of the
+track you came from, so they reach the synth that track plays ([below](#control-mode-follows-selected-track-the-track-cc-mod)).
 
-<img src="docs/img/track_cc.gif" width="520" alt="Knobs follow the track: stock sends the knob CCs on channel 1 whatever track Control mode came from; with the mod they go to that track's channel">
+<img src="docs/img/track_cc.gif" width="520" alt="Control mode follows selected track: stock sends the knob CCs on channel 1 whatever track Control mode came from; with the mod they go to that track's channel">
 
 Mods combine: tick several and they go into one update. `generative` and `filter-midicc` have been flashed to a real
 KeyStep Pro, and Generative tracks has been played on it; `track-cc` has not been on a real unit yet.
@@ -244,7 +244,7 @@ again. Switch to a pattern with another program, or flash the stock update, to g
 
 The mod only affects Bank Select and Program Change sent on a pattern switch. Nothing else changes.
 
-## Knobs follow the track (the `track-cc` mod)
+## Control mode follows selected track (the `track-cc` mod)
 
 <img src="docs/img/track_cc.gif" width="520" alt="Control mode entered from Track 2, 4 and 1 in turn: stock sends the knob CC on channel 1 every time, with the mod it goes to channel 3, 12 and 5">
 

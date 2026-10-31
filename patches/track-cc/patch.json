@@ -1,6 +1,6 @@
 {
   "name": "track-cc",
-  "title": "Knobs follow the track",
+  "title": "Control mode follows selected track",
   "pitch": "In Control mode the five knobs send their CCs on the MIDI channel of the track you came from, so they reach the synth that track plays. The knob's Global channel setting becomes Track.",
   "description": "In Control mode, knobs on the Global channel send on the MIDI channel of the track Control mode was entered from",
   "firmware": {
