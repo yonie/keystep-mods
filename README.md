@@ -21,8 +21,8 @@ drum pulses spread evenly over each drum lane's steps ([below](#generative-track
 
 **`filter-midicc`**: Clean pattern switches. A pattern switch no longer re-sends Bank MSB, Bank LSB and Program
 Change when that MIDI channel already has them, so the first note after a switch is no longer late on synths that
-reload their sound on every program change. Play sends each track's sound, so the synth is right from the first
-note after power-on ([below](#clean-pattern-switches-the-filter-midicc-mod)).
+reload their sound on every program change. Play and the first key send each track's sound, so the synth is
+right from the first note after power-on ([below](#clean-pattern-switches-the-filter-midicc-mod)).
 
 <img src="docs/img/clean_switches.gif" width="520" alt="Play, then pattern switches: stock sends no sound on Play and re-sends it on every switch; with the mod Play sends it once and the switches are on time">
 
@@ -234,10 +234,13 @@ With `filter-midicc` the KeyStep remembers, per MIDI channel, what it last sent 
 switch sends nothing when that channel already has those values. Any difference sends all three as before. The
 first switch after power-on always sends.
 
-Play also sends each track's current pattern sound, which the stock firmware never does: after power-on the synth
-gets its sound on the first Play instead of waiting for a pattern switch. A later Play sends nothing unless the
-sound changed. Editing PC, MSB or LSB in the menu still sends on every turn of the
-encoder, as stock does.
+Play also sends each track's sound, which the stock firmware never does, so you can switch the KeyStep and the
+synth off and on as often as you like:
+
+- **Play** always sends every track's sound, so the synth has it from the first note after power-on, and a synth
+  switched off and on on its own gets it back at the next Play.
+- **The first key** after power-on, or after Stop, sends the current track's sound before its note. The next keys
+  send nothing.
 
 If you change the sound on the synth by hand, a switch to a pattern with the same Program Change will not send it
 again. Switch to a pattern with another program, or flash the stock update, to get the old behaviour.

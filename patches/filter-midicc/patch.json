@@ -1,7 +1,7 @@
 {
   "name": "filter-midicc",
   "title": "Clean pattern switches",
-  "pitch": "Switch patterns without your synth hiccuping: Program Change and Bank Select only go out when the sound actually changes, so the first note lands on time. Play sends each track's sound, so the synth is right from the first note after power-on.",
+  "pitch": "Switch patterns without your synth hiccuping: Program Change and Bank Select only go out when the sound actually changes, so the first note lands on time. Play and the first key send each track's sound, so the synth is right after power-on.",
   "description": "Skip an unchanged Bank MSB / Bank LSB / Program Change on a pattern switch; send each track's on Play",
   "firmware": {
     "version": "2.5.20"
@@ -25,7 +25,13 @@
         "PORT": "0x20001800",
         "GET_MSB": "0x0802F112",
         "GET_LSB": "0x0802F14C",
-        "GET_PC": "0x0802F0D8"
+        "GET_PC": "0x0802F0D8",
+        "STOP_BACK": "0x0803C49C",
+        "CONSTRUCTOR": "0x0803B1FC",
+        "KEY_BACK": "0x08015350",
+        "KEY_LIT": "0x20000014",
+        "TRACK": "0x20004DB7",
+        "SEQ": "0x20001498"
       }
     },
     "chroma": {
@@ -45,7 +51,13 @@
         "PORT": "0x20001804",
         "GET_MSB": "0x0802F884",
         "GET_LSB": "0x0802F8B8",
-        "GET_PC": "0x0802F850"
+        "GET_PC": "0x0802F850",
+        "STOP_BACK": "0x0803CA14",
+        "CONSTRUCTOR": "0x0803B790",
+        "KEY_BACK": "0x08015564",
+        "KEY_LIT": "0x20000014",
+        "TRACK": "0x20004DD7",
+        "SEQ": "0x2000149C"
       }
     }
   },
@@ -77,7 +89,31 @@
         "chroma": "0x0803C236"
       },
       "asm": "b.w play_start",
-      "what": "FUN_0803B578(seq, 0xFA), Play: sends each track's current pattern PC when starting from stopped"
+      "what": "FUN_0803B578(seq, 0xFA), Play from stopped: every track's sound is sent"
+    },
+    {
+      "at": {
+        "standard": "0x0803C498",
+        "chroma": "0x0803CA10"
+      },
+      "asm": "b.w stop_forget",
+      "what": "FUN_0803B578(seq, 0xFC), Stop: the record is forgotten"
+    },
+    {
+      "at": {
+        "standard": "0x080166A4",
+        "chroma": "0x0801687E"
+      },
+      "asm": "bl boot_forget",
+      "what": "the boot's call to the sequencer constructor: the record is forgotten"
+    },
+    {
+      "at": {
+        "standard": "0x0801534C",
+        "chroma": "0x08015560"
+      },
+      "asm": "b.w key_press",
+      "what": "the panel handler's key-press case: the current track's sound, when its channel is not known yet"
     }
   ]
 }

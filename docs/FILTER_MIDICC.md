@@ -46,27 +46,39 @@ Mechanics:
 2. Inside `FUN_0801A708`, right after the channel is known and the range checks pass, the instruction at
    `0x0801A7E8` becomes a branch to the stub `check_and_record`: if the flag is set and the record matches, it
    returns from `FUN_0801A708`; otherwise it updates the record and continues to the three sends.
-3. The stubs (286 bytes, with `play_start` below) go right after the stock image, at `0x0805D1AC`. The 69 bytes of RAM (marker + record + flag) go
+3. The stubs (414 bytes, with the Play, key, Stop and boot hooks below) go right after the stock image, at `0x0805D1AC`. The 69 bytes of RAM (marker + record + flag) go
    in SDRAM at `0xC01ECF00`, a block the stock firmware never uses (`patches/free_space.json`). It is not cleared
    at boot: the first call after power-on finds no marker, clears the record and sets it.
 4. The menu editors are not touched.
 
-## Play sends the current sound
+## Switching both devices off and on: Play, keys, Stop and boot
 
-The stock firmware sends a pattern's PC only on a pattern switch or a menu edit, never on Play. After power-on
-the synth therefore stays on its own sound until the first switch.
+The stock firmware sends a pattern's PC only on a pattern switch or a menu edit, never on Play or a key. A synth
+switched on with the KeyStep therefore stays on its own sound until the first switch. And the SDRAM keeps its
+contents through a short power-off, so a record from before a reboot would say the synth still has a sound it
+lost when it was switched off too.
 
 | what | standard | Chroma |
 |---|---|---|
 | `FUN_0803B578(seq, code)`, the transport handler; `0xFA` (Play, panel or MIDI Start) branches to | `0x0803BCAE` | `0x0803C22E` |
 | hook: `ldrb.w fp, [r4, #0xc]` (the play flag; 0 = start from stopped or paused) | `0x0803BCB6` | `0x0803C236` |
+| hook: the `0xFC` (Stop) branch, `movs r5, #0 ; str r5, [sp, #4]` | `0x0803C498` | `0x0803CA10` |
+| hook: the boot's one call to the sequencer constructor `FUN_0803B1FC` | `0x080166A4` | `0x0801687E` (`0x0803B790`) |
+| hook: the panel handler's key-press case, `ldr r3, [pc, #0x198] ; ldr r2, [r3]` (`r3` = `0x20000014`) | `0x0801534C` | `0x08015560` |
 | each track's current pattern, one byte per track (written by `FUN_08030904`) | `0x20004DA8` | `0x20004DC8` |
 | the current bank, the 4th argument of the getters | `0x20004DAD` | `0x20004DCD` |
+| the current track 0..3 | `0x20004DB7` | `0x20004DD7` |
 | `*port`, the sender's 1st argument | `*0x20001800` | `*0x20001804` |
 | MSB / LSB / PC getters `(seq, track, pattern, bank)` | `0x0802F112` / `0x0802F14C` / `0x0802F0D8` | `0x0802F884` / `0x0802F8B8` / `0x0802F850` |
 
-The hook branches to `play_start`, which runs the replaced load and, when the play flag is 0, does for tracks
-0..3 exactly what the pattern switch does in `FUN_08035404` (`0x080355E0..0x08035618`): the three getters on the
-track's current pattern, then the sender through `switch_send`. So the record decides: the first Play after
-power-on sends each track's sound, a later Play sends nothing unless something changed, and a track with PC Send
-off or PC OFF sends nothing, as on a switch. It goes out before the first note, in the same millisecond.
+`send_track` does for one track what the pattern switch does in `FUN_08035404` (`0x080355E0..0x08035618`): the
+three getters on the track's current pattern, then the sender. A track with PC Send off or PC OFF sends nothing,
+as on a switch. What uses it:
+
+* **Play from stopped (or paused)** sends every track's sound straight to the sender, so always: a synth switched
+  off and on on its own gets its sound back at the next Play. The record still learns it.
+* **A key** sends the current track's sound through `switch_send`, so only when its channel's record does not know
+  it: the first key after power-on or after a Stop. It goes out just before the note.
+* **Boot and Stop forget the record**: they clear the marker, and the next send clears the entries.
+
+It all goes out before the first note, in the same millisecond.

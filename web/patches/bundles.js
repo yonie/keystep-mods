@@ -3,7 +3,7 @@ window.KSP_PATCHES = [
  {
   "name": "filter-midicc",
   "title": "Clean pattern switches",
-  "pitch": "Switch patterns without your synth hiccuping: Program Change and Bank Select only go out when the sound actually changes, so the first note lands on time. Play sends each track's sound, so the synth is right from the first note after power-on.",
+  "pitch": "Switch patterns without your synth hiccuping: Program Change and Bank Select only go out when the sound actually changes, so the first note lands on time. Play and the first key send each track's sound, so the synth is right after power-on.",
   "description": "Skip an unchanged Bank MSB / Bank LSB / Program Change on a pattern switch; send each track's on Play",
   "firmware": {
    "version": "2.5.20"
@@ -16,7 +16,7 @@ window.KSP_PATCHES = [
     "writes": [
      {
       "at": "0x0805D1AC",
-      "bytes": "10b582b0049c00944cf6447cccf21e0ca5248cf80040bdf7a1fa4cf6447cccf21e0c00248cf8004002b010bd94f80cb0bbf1000f32d12de9ef5182b0002544f6a856c2f20006765d44f6ad57c2f200073f782046294632463b46d1f784ff80462046294632463b46d1f79aff01902046294632463b46d1f759ff03460095019a414641f60000c2f200000068fff7b8ff0135042dd3db02b0bde8ef51def737bd4cf60071ccf21e010a6844f24943c4f649539a4209d00b604cf60471ccf21e0100224023043bca50fcd107f00f004cf60471ccf21e0101eb80014cf64472ccf21e021278a52a0dd1cb78a52b0ad10b78ab4207d14b78b34204d18b78a34201d1bdf772ba0d704e708c70a523cb704af68008c0f60108d8f80080bdf791ba"
+      "bytes": "10b582b0049c00944cf6447cccf21e0ca5248cf80040bdf7a1fa4cf6447cccf21e0c00248cf8004002b010bd2de9f04782b004460d46914644f6a856c2f20006765d44f6ad57c2f200073f782046294632463b46d1f787ff80462046294632463b46d1f79dff01902046294632463b46d1f75cff03460095019a414641f60000c2f200000068b9f1000f02d0fff7b8ff01e0bdf763fa02b0bde8f08794f80cb0bbf1000f0cd12de9ef510025204629460022fff7bbff0135042df7dbbde8ef51def725bd2de9f35f44f6b751c2f200010978032907d841f29840c2f2000000680122fff7a3ffbde8f35f40f21403c2f200031a68b8f756b803b44cf60070ccf21e000021016003bcddf7a2bf00254cf6007cccf21e0cccf800500195dff7e8b84cf60071ccf21e010a6844f24943c4f649539a4209d00b604cf60471ccf21e0100224023043bca50fcd107f00f004cf60471ccf21e0101eb80014cf64472ccf21e021278a52a0dd1cb78a52b0ad10b78ab4207d14b78b34204d18b78a34201d1bdf732ba0d704e708c70a523cb704af68008c0f60108d8f80080bdf751ba"
      },
      {
       "at": "0x08035618",
@@ -24,16 +24,28 @@ window.KSP_PATCHES = [
      },
      {
       "at": "0x0801A7E8",
-      "bytes": "42f030bd"
+      "bytes": "42f070bd"
      },
      {
       "at": "0x0803BCB6",
-      "bytes": "21f08fba"
+      "bytes": "21f0c7ba"
+     },
+     {
+      "at": "0x0803C498",
+      "bytes": "20f00ebf"
+     },
+     {
+      "at": "0x080166A4",
+      "bytes": "46f0fefd"
+     },
+     {
+      "at": "0x0801534C",
+      "bytes": "47f090bf"
      }
     ],
     "flash": [
      "0x0805D1AC",
-     "0x0805D2CA"
+     "0x0805D34A"
     ],
     "ram": [
      "0xC01ECF00",
@@ -42,7 +54,10 @@ window.KSP_PATCHES = [
     "hooks": [
      "0x08035618",
      "0x0801A7E8",
-     "0x0803BCB6"
+     "0x0803BCB6",
+     "0x0803C498",
+     "0x080166A4",
+     "0x0801534C"
     ]
    },
    {
@@ -52,7 +67,7 @@ window.KSP_PATCHES = [
     "writes": [
      {
       "at": "0x0805D900",
-      "bytes": "10b582b0049c00944cf6447cccf21e0ca5248cf80040bcf7a5ff4cf6447cccf21e0c00248cf8004002b010bd94f80cb0bbf1000f32d12de9ef5182b0002544f6c856c2f20006765d44f6cd57c2f200073f782046294632463b46d1f793ff80462046294632463b46d1f7a6ff01902046294632463b46d1f76bff03460095019a414641f60400c2f200000068fff7b8ff0135042dd3db02b0bde8ef51def74dbc4cf60071ccf21e010a6844f24943c4f649539a4209d00b604cf60471ccf21e0100224023043bca50fcd107f00f004cf60471ccf21e0101eb80014cf64472ccf21e021278a52a0dd1cb78a52b0ad10b78ab4207d14b78b34204d18b78a34201d1bcf776bf0d704e708c70a523cb704af6dc18c0f60108d8f80080bcf795bf"
+      "bytes": "10b582b0049c00944cf6447cccf21e0ca5248cf80040bcf7a5ff4cf6447cccf21e0c00248cf8004002b010bd2de9f04782b004460d46914644f6c856c2f20006765d44f6cd57c2f200073f782046294632463b46d1f796ff80462046294632463b46d1f7a9ff01902046294632463b46d1f76eff03460095019a414641f60400c2f200000068b9f1000f02d0fff7b8ff01e0bcf767ff02b0bde8f08794f80cb0bbf1000f0cd12de9ef510025204629460022fff7bbff0135042df7dbbde8ef51def73bbc2de9f35f44f6d751c2f200010978032907d841f29c40c2f2000000680122fff7a3ffbde8f35f40f21403c2f200031a68b7f7b6bd03b44cf60070ccf21e000021016003bcddf7c2be00254cf6007cccf21e0cccf800500195def7fabf4cf60071ccf21e010a6844f24943c4f649539a4209d00b604cf60471ccf21e0100224023043bca50fcd107f00f004cf60471ccf21e0101eb80014cf64472ccf21e021278a52a0dd1cb78a52b0ad10b78ab4207d14b78b34204d18b78a34201d1bcf736bf0d704e708c70a523cb704af6dc18c0f60108d8f80080bcf755bf"
      },
      {
       "at": "0x08035C44",
@@ -60,16 +75,28 @@ window.KSP_PATCHES = [
      },
      {
       "at": "0x0801A944",
-      "bytes": "43f02cb8"
+      "bytes": "43f06cb8"
      },
      {
       "at": "0x0803C236",
-      "bytes": "21f079bb"
+      "bytes": "21f0b1bb"
+     },
+     {
+      "at": "0x0803CA10",
+      "bytes": "20f0fcbf"
+     },
+     {
+      "at": "0x0801687E",
+      "bytes": "47f0bbf8"
+     },
+     {
+      "at": "0x08015560",
+      "bytes": "48f030ba"
      }
     ],
     "flash": [
      "0x0805D900",
-     "0x0805DA1E"
+     "0x0805DA9E"
     ],
     "ram": [
      "0xC01ECF00",
@@ -78,7 +105,10 @@ window.KSP_PATCHES = [
     "hooks": [
      "0x08035C44",
      "0x0801A944",
-     "0x0803C236"
+     "0x0803C236",
+     "0x0803CA10",
+     "0x0801687E",
+     "0x08015560"
     ]
    }
   ]
