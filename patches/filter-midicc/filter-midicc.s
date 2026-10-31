@@ -14,6 +14,7 @@
 @   0x08035618  BL FUN_0801A708  ->  BL switch_send      (the pattern switch in FUN_08035404)
 @   0x0801A7E8  LDR.W r8,[pc,#0x94]  ->  B.W check_and_record   (FUN_0801A708, after the channel and range
 @               checks, before the three sends)
+@   0x0803BCB6  LDRB.W fp,[r4,#0xc]  ->  B.W play_start   (FUN_0803B578(seq, 0xFA), Play: fp = the play flag)
 
 @ ---- switch_send: the pattern switch calls the sender through here, with the flag set -------------------
 @ FUN_0801A708 takes a 5th argument (the track) on the stack, so the stub re-pushes it before the call.
@@ -33,6 +34,57 @@ switch_send:
     strb    r4, [ip]
     add     sp, #8
     pop     {r4, pc}
+
+@ ---- play_start: Play from stopped sends each track's current pattern PC, as a pattern switch would -------
+@ The stock firmware only sends it on a pattern switch, so after power-on the synth keeps its own sound until
+@ the first switch. Each send goes through switch_send, so a channel that already has those values gets nothing.
+@ Live here: r4 = the sequencer object. Everything else is saved; fp is the replaced load and is left as is.
+play_start:
+    ldrb.w  fp, [r4, #0xc]          @ the instruction the hook replaced: the play flag
+    cmp.w   fp, #0
+    bne     play_back               @ already running: Play pauses, nothing to send
+    push    {r0, r1, r2, r3, r5, r6, r7, r8, ip, lr}
+    sub     sp, #8
+    movs    r5, #0                  @ track 0..3
+play_track:
+    movw    r6, #{CURPAT_LO}
+    movt    r6, #{CURPAT_HI}
+    ldrb    r6, [r6, r5]            @ the track's current pattern
+    movw    r7, #{BANK_LO}
+    movt    r7, #{BANK_HI}
+    ldrb    r7, [r7]
+    mov     r0, r4
+    mov     r1, r5
+    mov     r2, r6
+    mov     r3, r7
+    bl      {GET_MSB}
+    mov     r8, r0
+    mov     r0, r4
+    mov     r1, r5
+    mov     r2, r6
+    mov     r3, r7
+    bl      {GET_LSB}
+    str     r0, [sp, #4]
+    mov     r0, r4
+    mov     r1, r5
+    mov     r2, r6
+    mov     r3, r7
+    bl      {GET_PC}
+    mov     r3, r0
+    str     r5, [sp]                @ the sender's 5th argument: the track
+    ldr     r2, [sp, #4]
+    mov     r1, r8
+    movw    r0, #{PORT_LO}
+    movt    r0, #{PORT_HI}
+    ldr     r0, [r0]
+    bl      switch_send
+    adds    r5, #1
+    cmp     r5, #4
+    blt     play_track
+    add     sp, #8
+    pop     {r0, r1, r2, r3, r5, r6, r7, r8, ip, lr}
+play_back:
+    b.w     {PLAY_BACK}
 
 @ ---- check_and_record: inside FUN_0801A708 -------------------------------------------------------------
 @ Live here: r7 = MIDI channel (the sender masks it with 0xF), r5 = MSB, r6 = LSB, r4 = PC (wire value 0..127).

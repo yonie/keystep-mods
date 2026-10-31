@@ -2,7 +2,7 @@
  "patches": [
   {
    "name": "filter-midicc",
-   "description": "Skip an unchanged Bank MSB / Bank LSB / Program Change on a pattern switch",
+   "description": "Skip an unchanged Bank MSB / Bank LSB / Program Change on a pattern switch; send each track's on Play",
    "file": "filter-midicc.json"
   },
   {

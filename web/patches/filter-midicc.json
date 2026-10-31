@@ -1,8 +1,8 @@
 {
  "name": "filter-midicc",
  "title": "Clean pattern switches",
- "pitch": "Switch patterns without your synth hiccuping: Program Change and Bank Select only go out when the sound actually changes, so the first note lands on time.",
- "description": "Skip an unchanged Bank MSB / Bank LSB / Program Change on a pattern switch",
+ "pitch": "Switch patterns without your synth hiccuping: Program Change and Bank Select only go out when the sound actually changes, so the first note lands on time. Play sends each track's sound, so the synth is right from the first note after power-on.",
+ "description": "Skip an unchanged Bank MSB / Bank LSB / Program Change on a pattern switch; send each track's on Play",
  "firmware": {
   "version": "2.5.20"
  },
@@ -14,7 +14,7 @@
    "writes": [
     {
      "at": "0x0805D1AC",
-     "bytes": "10b582b0049c00944cf6447cccf21e0ca5248cf80040bdf7a1fa4cf6447cccf21e0c00248cf8004002b010bd4cf60071ccf21e010a6844f24943c4f649539a4209d00b604cf60471ccf21e0100224023043bca50fcd107f00f004cf60471ccf21e0101eb80014cf64472ccf21e021278a52a0dd1cb78a52b0ad10b78ab4207d14b78b34204d18b78a34201d1bdf7acba0d704e708c70a523cb704af68008c0f60108d8f80080bdf7cbba"
+     "bytes": "10b582b0049c00944cf6447cccf21e0ca5248cf80040bdf7a1fa4cf6447cccf21e0c00248cf8004002b010bd94f80cb0bbf1000f32d12de9ef5182b0002544f6a856c2f20006765d44f6ad57c2f200073f782046294632463b46d1f784ff80462046294632463b46d1f79aff01902046294632463b46d1f759ff03460095019a414641f60000c2f200000068fff7b8ff0135042dd3db02b0bde8ef51def737bd4cf60071ccf21e010a6844f24943c4f649539a4209d00b604cf60471ccf21e0100224023043bca50fcd107f00f004cf60471ccf21e0101eb80014cf64472ccf21e021278a52a0dd1cb78a52b0ad10b78ab4207d14b78b34204d18b78a34201d1bdf772ba0d704e708c70a523cb704af68008c0f60108d8f80080bdf791ba"
     },
     {
      "at": "0x08035618",
@@ -22,12 +22,16 @@
     },
     {
      "at": "0x0801A7E8",
-     "bytes": "42f0f6bc"
+     "bytes": "42f030bd"
+    },
+    {
+     "at": "0x0803BCB6",
+     "bytes": "21f08fba"
     }
    ],
    "flash": [
     "0x0805D1AC",
-    "0x0805D256"
+    "0x0805D2CA"
    ],
    "ram": [
     "0xC01ECF00",
@@ -35,7 +39,8 @@
    ],
    "hooks": [
     "0x08035618",
-    "0x0801A7E8"
+    "0x0801A7E8",
+    "0x0803BCB6"
    ]
   },
   {
@@ -45,7 +50,7 @@
    "writes": [
     {
      "at": "0x0805D900",
-     "bytes": "10b582b0049c00944cf6447cccf21e0ca5248cf80040bcf7a5ff4cf6447cccf21e0c00248cf8004002b010bd4cf60071ccf21e010a6844f24943c4f649539a4209d00b604cf60471ccf21e0100224023043bca50fcd107f00f004cf60471ccf21e0101eb80014cf64472ccf21e021278a52a0dd1cb78a52b0ad10b78ab4207d14b78b34204d18b78a34201d1bcf7b0bf0d704e708c70a523cb704af6dc18c0f60108d8f80080bcf7cfbf"
+     "bytes": "10b582b0049c00944cf6447cccf21e0ca5248cf80040bcf7a5ff4cf6447cccf21e0c00248cf8004002b010bd94f80cb0bbf1000f32d12de9ef5182b0002544f6c856c2f20006765d44f6cd57c2f200073f782046294632463b46d1f793ff80462046294632463b46d1f7a6ff01902046294632463b46d1f76bff03460095019a414641f60400c2f200000068fff7b8ff0135042dd3db02b0bde8ef51def74dbc4cf60071ccf21e010a6844f24943c4f649539a4209d00b604cf60471ccf21e0100224023043bca50fcd107f00f004cf60471ccf21e0101eb80014cf64472ccf21e021278a52a0dd1cb78a52b0ad10b78ab4207d14b78b34204d18b78a34201d1bcf776bf0d704e708c70a523cb704af6dc18c0f60108d8f80080bcf795bf"
     },
     {
      "at": "0x08035C44",
@@ -53,12 +58,16 @@
     },
     {
      "at": "0x0801A944",
-     "bytes": "42f0f2bf"
+     "bytes": "43f02cb8"
+    },
+    {
+     "at": "0x0803C236",
+     "bytes": "21f079bb"
     }
    ],
    "flash": [
     "0x0805D900",
-    "0x0805D9AA"
+    "0x0805DA1E"
    ],
    "ram": [
     "0xC01ECF00",
@@ -66,7 +75,8 @@
    ],
    "hooks": [
     "0x08035C44",
-    "0x0801A944"
+    "0x0801A944",
+    "0x0803C236"
    ]
   }
  ]

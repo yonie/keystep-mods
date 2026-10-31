@@ -1,8 +1,8 @@
 {
   "name": "filter-midicc",
   "title": "Clean pattern switches",
-  "pitch": "Switch patterns without your synth hiccuping: Program Change and Bank Select only go out when the sound actually changes, so the first note lands on time.",
-  "description": "Skip an unchanged Bank MSB / Bank LSB / Program Change on a pattern switch",
+  "pitch": "Switch patterns without your synth hiccuping: Program Change and Bank Select only go out when the sound actually changes, so the first note lands on time. Play sends each track's sound, so the synth is right from the first note after power-on.",
+  "description": "Skip an unchanged Bank MSB / Bank LSB / Program Change on a pattern switch; send each track's on Play",
   "firmware": {
     "version": "2.5.20"
   },
@@ -18,7 +18,14 @@
         "SENDER": "0x0801A708",
         "SEND": "0x0801A7EC",
         "EPILOGUE": "0x0801A794",
-        "POOL": "0x0801A880"
+        "POOL": "0x0801A880",
+        "PLAY_BACK": "0x0803BCBA",
+        "CURPAT": "0x20004DA8",
+        "BANK": "0x20004DAD",
+        "PORT": "0x20001800",
+        "GET_MSB": "0x0802F112",
+        "GET_LSB": "0x0802F14C",
+        "GET_PC": "0x0802F0D8"
       }
     },
     "chroma": {
@@ -31,7 +38,14 @@
         "SENDER": "0x0801A864",
         "SEND": "0x0801A948",
         "EPILOGUE": "0x0801A8F0",
-        "POOL": "0x0801A9DC"
+        "POOL": "0x0801A9DC",
+        "PLAY_BACK": "0x0803C23A",
+        "CURPAT": "0x20004DC8",
+        "BANK": "0x20004DCD",
+        "PORT": "0x20001804",
+        "GET_MSB": "0x0802F884",
+        "GET_LSB": "0x0802F8B8",
+        "GET_PC": "0x0802F850"
       }
     }
   },
@@ -56,6 +70,14 @@
       },
       "asm": "b.w check_and_record",
       "what": "FUN_0801A708, after the channel and range checks"
+    },
+    {
+      "at": {
+        "standard": "0x0803BCB6",
+        "chroma": "0x0803C236"
+      },
+      "asm": "b.w play_start",
+      "what": "FUN_0803B578(seq, 0xFA), Play: sends each track's current pattern PC when starting from stopped"
     }
   ]
 }

@@ -226,7 +226,11 @@ after a switch late.
 
 With `filter-midicc` the KeyStep remembers, per MIDI channel, what it last sent since power-on, and a pattern
 switch sends nothing when that channel already has those values. Any difference sends all three as before. The
-first switch after power-on always sends. Editing PC, MSB or LSB in the menu still sends on every turn of the
+first switch after power-on always sends.
+
+Play also sends each track's current pattern sound, which the stock firmware never does: after power-on the synth
+gets its sound on the first Play instead of waiting for a pattern switch. A later Play sends nothing unless the
+sound changed. Editing PC, MSB or LSB in the menu still sends on every turn of the
 encoder, as stock does.
 
 If you change the sound on the synth by hand, a switch to a pattern with the same Program Change will not send it
