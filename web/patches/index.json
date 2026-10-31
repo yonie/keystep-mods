@@ -9,6 +9,11 @@
    "name": "generative",
    "description": "Generative tracks: hold a track's Seq and press its Arp - Tracks 2..4 go into Flux, a melody loop that keeps changing; Track 1 (Seq + Drum) goes into Pulse, drum pulses spread evenly over each lane's steps - set with the five encoders; the track display shows FL / PU",
    "file": "generative.json"
+  },
+  {
+   "name": "track-cc",
+   "description": "In Control mode, knobs on the Global channel send on the MIDI channel of the track Control mode was entered from",
+   "file": "track-cc.json"
   }
  ]
 }

@@ -307,11 +307,12 @@
 
   const VISUALS = { generative: v => { fluxVisual(v); pulseVisual(v); }, 'filter-midicc': midiVisual };
   const GUIDE = { generative: '#generative-tracks-the-generative-mod',
-                  'filter-midicc': '#clean-pattern-switches-the-filter-midicc-mod' };
+                  'filter-midicc': '#clean-pattern-switches-the-filter-midicc-mod',
+                  'track-cc': '#knobs-follow-the-track-the-track-cc-mod' };
 
   // ---- the mod cards --------------------------------------------------------------------------------------------
   const list = $('mods');
-  const ORDER = ['generative', 'filter-midicc'];         // the showpiece first
+  const ORDER = ['generative', 'filter-midicc', 'track-cc'];         // the showpiece first
   const shown = [...bundles].sort((a, b) => (ORDER.indexOf(a.name) + 1 || 99) - (ORDER.indexOf(b.name) + 1 || 99));
   for (const b of shown) {
     const card = el('label', { class: 'mod on' }, list);

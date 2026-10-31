@@ -267,5 +267,78 @@ window.KSP_PATCHES = [
     ]
    }
   ]
+ },
+ {
+  "name": "track-cc",
+  "title": "Knobs follow the track",
+  "pitch": "In Control mode the five knobs send their CCs on the MIDI channel of the track you came from, so they reach the synth that track plays.",
+  "description": "In Control mode, knobs on the Global channel send on the MIDI channel of the track Control mode was entered from",
+  "firmware": {
+   "version": "2.5.20"
+  },
+  "parts": [
+   {
+    "model": "standard",
+    "image": "keysteppro_main__fw2_5_20_2085__2024_03_04.bin",
+    "sha256": "5cef3d2fa93610028dcb9a92c3d09949e6b56de79ff0d05050b61a57ff86fb15",
+    "writes": [
+     {
+      "at": "0x08060000",
+      "bytes": "02b500f00bf8bde80240b2f787bd02b500f004f8bde80240b3f7e6bf1c797f2c2ad140f2a410c2f200000078042823d144f6b751c2f20001097803291cd811f14b0289b904b541f29840c2f20000006844f6ad52c2f2000212780021cbf77efabde8044000b14f2240f67400c2f200008018047904f00f047f2c7047"
+     },
+     {
+      "at": "0x08012B18",
+      "bytes": "4df072ba"
+     },
+     {
+      "at": "0x08013FE4",
+      "bytes": "4cf013b8"
+     }
+    ],
+    "flash": [
+     "0x08060000",
+     "0x0806007C"
+    ],
+    "ram": [
+     "0x00000000",
+     "0x00000000"
+    ],
+    "hooks": [
+     "0x08012B18",
+     "0x08013FE4"
+    ]
+   },
+   {
+    "model": "chroma",
+    "image": "keysteppro_main_chroma__fw2_5_20_375__2024_03_04.bin",
+    "sha256": "cfc18db3e7f2c54ad0b123a3a8efc6adf75ddaef9789230ad8e0285585fe6616",
+    "writes": [
+     {
+      "at": "0x08060800",
+      "bytes": "02b500f00bf8bde80240b2f791ba02b500f004f8bde80240b3f7f0bc1c797f2c2ad140f2a810c2f200000078042823d144f6d751c2f20001097803291cd811f14b0289b904b541f29c40c2f20000006844f6cd52c2f2000212780021cbf710f9bde8044000b14f2240f67800c2f200008018047904f00f047f2c7047"
+     },
+     {
+      "at": "0x08012D2C",
+      "bytes": "4df068bd"
+     },
+     {
+      "at": "0x080141F8",
+      "bytes": "4cf009bb"
+     }
+    ],
+    "flash": [
+     "0x08060800",
+     "0x0806087C"
+    ],
+    "ram": [
+     "0x00000000",
+     "0x00000000"
+    ],
+    "hooks": [
+     "0x08012D2C",
+     "0x080141F8"
+    ]
+   }
+  ]
  }
 ];
