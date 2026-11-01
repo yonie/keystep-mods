@@ -267,8 +267,6 @@ again, and the knobs follow that track's channel. Track 1 in Drum mode uses its 
   synth.
 - **Outside Control mode** nothing changes.
 
-Looking for more cool stuff? I also release open source audio VST plugins as [WET VST](https://wetvst.com).
-
 ## For developers
 
 You do not need anything below to use the mods: the browser page does everything.
@@ -303,3 +301,5 @@ patcher's copy (`web/patches/`).
 ## Licence
 
 MIT, see `LICENSE`. Arturia and KeyStep Pro are trademarks of Arturia; this project is not affiliated with Arturia.
+
+Looking for more cool stuff? I also release open source audio VST plugins as [WET VST](https://wetvst.com).
