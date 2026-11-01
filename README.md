@@ -26,7 +26,7 @@ right from the first note after power-on ([below](#clean-pattern-switches-the-fi
 
 <img src="docs/img/clean_switches.gif" width="520" alt="Play, then pattern switches: stock sends no sound on Play and re-sends it on every switch; with the mod Play sends it once and the switches are on time">
 
-**`track-cc`**: Control mode follows selected track. In Control mode a knob set to Track sends its CC on the MIDI channel
+**`track-cc`**: Control mode follows selected track. In Control mode a knob on the Global channel sends its CC on the MIDI channel
 of the track you came from, so it reaches the synth that track plays ([below](#control-mode-follows-selected-track-the-track-cc-mod)).
 
 <img src="docs/img/track_cc.gif" width="520" alt="Control mode follows selected track: stock sends the knob CCs on channel 1 whatever track Control mode came from; with the mod they go to that track's channel">
@@ -255,20 +255,17 @@ Press Control and the five knobs above the step buttons send MIDI CCs (CC 74 to 
 `Utility > Controller > Knob 1..5`). Stock, every knob left on its default channel, Global, sends on the Global MIDI
 channel (`Utility > Controller > Global MIDI chan`, channel 1 out of the box), whichever track you were on.
 
-With `track-cc` the knob's Channel setting (`Utility > Controller > Knob N > Channel`) has one more choice after
-Global: **Track**. Turn past Global to get it. Track means the MIDI Channel OUT of the track you entered Control mode
-from: the track whose button blinks while Control is on. Set the knobs to Track, select Track 2, press Control, and
-the knobs reach the synth Track 2 plays, say a JV-1010 on channel 3, to sweep its cutoff and resonance. Select
-another track, press Control again, and the knobs follow that track's channel. Track 1 in Drum mode uses its Drum
-Output channel.
+With `track-cc` a knob on Global sends on the MIDI Channel OUT of the track you entered Control mode from instead:
+the track whose button blinks while Control is on. Select Track 2, press Control, and the knobs reach the synth
+Track 2 plays, say a JV-1010 on channel 3, to sweep its cutoff and resonance. Select another track, press Control
+again, and the knobs follow that track's channel. Track 1 in Drum mode uses its Drum Output channel.
 
-- **Global** stays the default and means what it always did: the Global MIDI chan. A knob you do not set to Track
-  works as on stock.
+- **No new settings.** The mod adds no menu choice and stores nothing: settings and MIDI Control Center work and
+  save exactly as on stock. Global simply means "the track's channel" in Control mode.
 - **CC numbers, Port, Min and Max** stay as set per knob.
 - **A knob set to its own channel** (1 to 16) keeps sending there. Use that for a knob that should always reach one
-  synth. Mix as you like: some knobs on Track, some on Global, some on a fixed channel.
-- **Outside Control mode** nothing changes. The only thing on screen that differs from stock is the extra choice in
-  the knob's Channel setting.
+  synth.
+- **Outside Control mode** nothing changes.
 
 Looking for more cool stuff? I also release open source audio VST plugins as [WET VST](https://wetvst.com).
 
