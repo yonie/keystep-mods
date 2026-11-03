@@ -99,9 +99,6 @@
   #drop b { color: var(--ink); }
   code { font: 13px ui-monospace, Consolas, monospace; background: var(--bg); padding: 1px 5px; border-radius: 4px;
          overflow-wrap: anywhere; }
-  .download { display: block; width: fit-content; margin-top: 12px; padding: 10px 16px; border: 1px solid var(--accent); border-radius: 10px;
-              color: var(--accent); font-weight: 650; text-decoration: none; overflow-wrap: anywhere; }
-  .download:hover { background: var(--drop); }
   .lead { color: var(--muted); font-size: 14px; margin: -6px 2px 12px; }
   .hint { color: var(--muted); font-size: 13px; margin: 10px 2px 0; }
   .status { margin-top: 10px; font-weight: 500; }
@@ -467,18 +464,14 @@
     if (e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
   });
 
-  let lastUrl = null;
   $('build').addEventListener('click', async () => {
     try {
       const r = await KSPatch.build(stockBytes, chosen());
-      if (lastUrl) URL.revokeObjectURL(lastUrl);
-      const url = lastUrl = URL.createObjectURL(new Blob([r.bytes], { type: 'application/octet-stream' }));
+      const url = URL.createObjectURL(new Blob([r.bytes], { type: 'application/octet-stream' }));
       const a = document.createElement('a');
       a.href = url; a.download = r.filename; document.body.appendChild(a); a.click(); a.remove();
-      // the download also stays on the page as a link, in case the browser held the automatic one back
-      say($('result'), 'Your firmware is ready. Flash it with MIDI Control Center.', 'good');
-      const dl = el('a', { class: 'download', href: url, download: r.filename }, $('result'));
-      dl.textContent = 'Download ' + r.filename;
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      say($('result'), 'Saved ' + r.filename + '. Flash it with MIDI Control Center.', 'good');
     } catch (e) {
       say($('result'), e.message, 'bad');
     }
