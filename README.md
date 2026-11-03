@@ -277,7 +277,7 @@ Python 3, `pip install keystone-engine`, and for C mods the
 [Arm GNU Toolchain](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads):
 
 ```
-python patches/make_patch.py generative filter-midicc   # -> keystep-pro_Firmware_2.5.20+generative+filter-midicc.kspf
+python patches/make_patch.py generative filter-midicc   # -> keystep-pro_Firmware_2.5.20+generative+filter-midicc_mods-<release>.kspf
 ```
 
 `make_patch.py` and the web page both refuse any file that is not the exact stock 2.5.20 update, and both give

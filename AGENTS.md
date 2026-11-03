@@ -15,6 +15,10 @@ user's own stock update file. The global instructions in `G:\code\AGENTS.md` and
   from `web/` by `.github/workflows/pages.yml`) instead of showing it; the page links back to the README. Anything else is a stylised drawing made by `docs/oled.py`: the OLED popups from their text, the step LEDs as
   an abstract row of squares. Never draw the device's shape or panel layout.
 - **No vendor names as mod names.** Mods get their own names, never Arturia feature names (Mutate, Spice, Dice...).
+- **Releases:** every change users get is a release. Add it on top of `CHANGELOG.md` (`## x.y.z - YYYY-MM-DD`, one
+  bullet per change, in the user's words): that file is the only source of the version, the patcher page's
+  changelog and the built file's name (`..._mods-x.y.z.kspf`). Then export, commit, tag `vx.y.z`, push, and make the
+  GitHub release with that entry as its notes. A new mod or feature is a minor version, a fix a patch version.
 - After changing a mod: `python patches/make_patch.py --export`, then `node web/test_kspatch.js` (the web
   patcher must stay byte-identical to `make_patch.py`).
 

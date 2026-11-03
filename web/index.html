@@ -110,6 +110,16 @@
   button { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; padding: 12px 22px;
            font: inherit; font-weight: 650; cursor: pointer; }
   button:disabled { opacity: .45; cursor: not-allowed; }
+  .release { font-size: 13px; color: var(--muted); margin: -4px 2px 18px; }
+  .release a { color: inherit; }
+  .fresh { display: inline-block; background: var(--accent); color: var(--accent-ink); font-size: 11px; font-weight: 700;
+           letter-spacing: .03em; border-radius: 999px; padding: 1px 8px; margin-left: 6px; vertical-align: 1px; }
+  #changes .ver { border-top: 1px solid var(--line); padding: 12px 2px 4px; }
+  #changes .ver:first-child { border-top: 0; padding-top: 0; }
+  #changes h3 { font-size: 14px; margin: 0 0 4px; }
+  #changes h3 time { color: var(--muted); font-weight: 400; margin-left: 8px; }
+  #changes ul { margin: 4px 0 0; padding-left: 20px; font-size: 14px; line-height: 1.5; }
+  #changes li { margin: 3px 0; }
   footer { color: var(--muted); font-size: 12.5px; margin-top: 32px; border-top: 1px solid var(--line); padding-top: 14px; }
   footer p { margin: 6px 0; }
   .wetmark { font-weight: 800; letter-spacing: -.01em; color: #fff; font-size: 17px; flex: none; }
@@ -133,6 +143,7 @@
   <p class="sub">New tricks for your KeyStep Pro. Pick the mods you want, drop in the official firmware file, and flash
     the result with MIDI Control Center like any update. Everything happens in this browser.
     <a href="https://github.com/yonie/keystep-mods#readme">The guide</a> explains every mod, flashing, and going back.</p>
+  <p class="release" id="release"></p>
   <div class="risk"><b>At your own risk.</b> These mods are unofficial changes to the KeyStep Pro firmware, not made,
     checked or supported by Arturia. You flash them entirely at your own risk and responsibility. They come as they
     are, without warranty of any kind, and the author is not liable for any damage, data loss or malfunction of your
@@ -162,14 +173,20 @@
     </div>
   </section>
 
+  <section id="changes-section">
+    <h2>What changed</h2>
+    <p class="hint" style="margin:0 2px 12px">The file you build is named after the version, for example
+      <code id="example-name"></code>, so you can see which one is on your KeyStep. If yours is older than the newest
+      version below, build and flash it again.</p>
+    <div class="box" id="changes"></div>
+  </section>
+
   <footer>
     <p>Flash the downloaded file with MIDI Control Center. To go back, flash the original update file. The mods work on
       firmware 2.5.20, on the KeyStep Pro and the KeyStep Pro Chroma; your firmware file never leaves this browser.
       Step by step: <a href="https://github.com/yonie/keystep-mods#flashing-it">flashing</a>,
       <a href="https://github.com/yonie/keystep-mods#going-back-to-stock">going back</a> and
       <a href="https://github.com/yonie/keystep-mods#if-it-does-not-start">if it does not start</a>.</p>
-    <p>Version 1.1.1 (3 November 2026): swung steps play in generative mode.
-      <a href="https://github.com/yonie/keystep-mods/blob/main/CHANGELOG.md">All changes</a>.</p>
     <p>Each mod is tested against the stock firmware before it is listed here. Use at your own risk: the mods come
       without any warranty. Arturia and KeyStep Pro are trademarks of Arturia; this project is not affiliated with Arturia.</p>
   </footer>
@@ -456,6 +473,44 @@
     }
   });
   if (!bundles.length) say($('result'), 'No mods found (web/patches/bundles.js).', 'bad');
+
+  // ---- the release and what changed, from CHANGELOG.md (exported into bundles.js) ---------------------------------
+  (function changes() {
+    const log = window.KSP_CHANGELOG || [];
+    if (!log.length) { $('changes-section').hidden = true; return; }
+    const newer = (a, b) => {                              // version a is later than version b
+      const x = a.split('.').map(Number), y = b.split('.').map(Number);
+      for (let i = 0; i < Math.max(x.length, y.length); i++)
+        if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0);
+      return false;
+    };
+    const day = iso => new Date(iso + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+    let seen = null;                                       // the newest version this browser has shown before
+    try { seen = localStorage.getItem('ksp-seen-version'); } catch (e) {}
+    const isNew = v => seen && newer(v, seen);
+    // the changelog is our own text: bold, code and links only
+    const md = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/`(.+?)`/g, '<code>$1</code>')
+      .replace(/\[(.+?)\]\((https:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+    const top = log[0], rel = $('release');
+    rel.append('Version ' + top.version + ' · ' + day(top.date) + ' · ');
+    const a = el('a', { href: '#changes-section' }, rel);
+    a.textContent = 'What changed';
+    if (isNew(top.version)) el('span', { class: 'fresh' }, rel).textContent = 'NEW SINCE YOUR LAST VISIT';
+    $('example-name').textContent = 'keystep-pro_Firmware_2.5.20+…_mods-' + top.version + '.kspf';
+
+    for (const r of log) {
+      const v = el('div', { class: 'ver' }, $('changes'));
+      const h = el('h3', {}, v);
+      h.append(r.version);
+      el('time', { datetime: r.date }, h).textContent = day(r.date);
+      if (isNew(r.version)) el('span', { class: 'fresh' }, h).textContent = 'NEW';
+      const ul = el('ul', {}, v);
+      for (const it of r.items) el('li', {}, ul).innerHTML = md(it);
+    }
+    try { localStorage.setItem('ksp-seen-version', top.version); } catch (e) {}
+  })();
 })();
 </script>
 </body>

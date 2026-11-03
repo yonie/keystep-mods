@@ -213,7 +213,7 @@
             data: e.name === 'info.json' ? infoBytes : patched.get(e.name) || e.data }));
         return {
             bytes: zip(out),
-            filename: 'keystep-pro_Firmware_' + info.version_number + '.kspf',
+            filename: 'keystep-pro_Firmware_' + info.version_number + '_mods-' + bundles[0].release + '.kspf',
             version: info.version_number,
             grown,
         };
