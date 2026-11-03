@@ -18,7 +18,7 @@ same. Sources: `patches/generative/generative.c` (the logic, C), `patches/genera
 | main RAM | `0xC01EC000..0xC01ECF00` (SDRAM) | a block of the 2 MB SDRAM the firmware never uses; about 0x700 bytes used, 1 KB of it the Pulse save area |
 | UI flash | `0x0802F010..0x0802F100` | after the stock UI image (ends `0x0802F004`); 52 bytes used, no RAM |
 
-That SDRAM is not cleared at boot, so the state carries a marker (`"GEN1"`) and is zeroed the first time any hook
+That SDRAM is not cleared at boot, so the state carries a marker (`"GEN3"`) and is zeroed the first time any hook
 runs without it. (Not the CCM at `0x10000000`: the main MCU has no working CCM, and a first build that kept its
 state there left the unit on its boot logo.) `make_patch.py` builds the C with arm-none-eabi-gcc (`-Os`, no libc, `.data` must be empty)
 and links it at those addresses.
@@ -29,6 +29,8 @@ and links it at those addresses.
 |---|---|---|---|
 | `0x080500F4` | `bl FUN_0804AC6E` in the press handler `FUN_080500D8` | `gen_press_hook` | the Seq + Arp/Drum chord, and leaving with Seq or Arp/Drum alone |
 | `0x08039BDC` | `push.w {r4-r11,lr}`, entry of the step player `FUN_08039BDC(seq, track)` | `gen_play_hook` | a generative track plays its generated note |
+| `0x08039588` | `push.w {r4-r11,lr}`, entry of `FUN_08039588(seq, track)`, the deferred note-ons | `gen_due2_hook` | a swung or shifted generative note is shown its step again when it is due |
+| `0x080391C8` | `push.w {r4-r11,lr}`, entry of `FUN_080391C8(seq, track)`, the other deferred note-ons | `gen_due_hook` | same |
 | `0x08012730` | `sub.w r8, r6, #3` (turn up) in `FUN_08012338` | `gen_turn_up_hook` | the five encoders set the generator |
 | `0x08013BE6` | `sub.w r8, r6, #3` (turn down) | `gen_turn_down_hook` | same |
 | `0x0801269C` | `bl FUN_080100BC` (stock encoder popup) | `gen_touch_hook` | our popup on touch |
@@ -111,6 +113,13 @@ generative track the hook calls `gen_play(seq, t)`, which for a Flux track:
 4. calls the stock player (`gen_play_orig`, the replaced `push.w` followed by a branch to `0x08039BE0`);
 5. puts every saved byte back.
 
+A note the player does not play at once (swing delays every second step; Time Shift; any note whose time is still
+ahead) is queued as its time, slot and row (`seq + (0x2133 + t*32 + i)*8`: u32 time, slot at `+4`, row at `+5`), and
+the timer looks that slot up only when it is due, in `FUN_08039588` (or `FUN_080391C8`; `FUN_08048xxx` picks one per
+track) - after step 5. So the step is kept (`g.lent`, set from the first step after entering) and `gen_due` shows it
+to that handler the same way, steps 2..5 around the stock call. Without it a swung step stayed silent (the third hit
+of E(16,3) on step 12, every second Flux note).
+
 So the note goes out through the firmware's own path (channel, gate length and note-off, USB, DIN, CV/gate,
 mute, swing, and the track's scale and root, which quantise it) and the pattern in memory is the same before and
 after, byte for byte.
@@ -142,7 +151,8 @@ For one step `pulse_play` advances each lane's own position (modulo its Steps), 
 (`((i - Rotate) * Pulses) mod Steps < Pulses`, then Chance), saves Track 1's whole slot table (64 rows, 1 KB, into
 its own RAM) and blanks it, and for the j-th lane that plays writes pool entry j {lane, 7, 100, 0x31, 100}, sets its
 ratchet nibble, clears its tie flag, sets the lane's step-on bit for its row and puts j in that row. Then the stock
-player runs, and every byte is put back. Blanking the whole table also keeps stored hits out (the player's
+player runs, and every byte is put back. The rows are kept with the hits, so a swung hit is shown the same step when
+it is due (above). Blanking the whole table also keeps stored hits out (the player's
 look-ahead reads the next row too).
 
 ### Settings it follows

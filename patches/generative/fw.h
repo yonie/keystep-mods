@@ -21,6 +21,8 @@
 #define FW_BTN_DOWN     0x0804B2EE      // FUN_0804AC6E: mark a button down
 #define FW_PRESS_EPI    0x0805099E      // FUN_080500D8's epilogue (add sp,#0x244; pop {r4-r11,pc})
 #define FW_PLAY_4       0x0803A198      // FUN_08039BDC (the step player) after its push.w
+#define FW_DUE_4        0x08039784      // FUN_080391C8 (deferred note-ons) after its push.w
+#define FW_DUE2_4       0x08039B44      // FUN_08039588 (deferred note-ons, the other) after its push.w
 #define FW_POPUP        0x080102D0      // FUN_080100BC: the stock encoder popup
 #define FW_POPUP_TIMER  0x0801F964      // FUN_0801F7D8
 #define FW_LED_FLUSH    0x080552D8      // FUN_08054C2C
@@ -60,6 +62,8 @@
 #define FW_BTN_DOWN     0x0804AC6E
 #define FW_PRESS_EPI    0x0805031E
 #define FW_PLAY_4       0x08039BE0
+#define FW_DUE_4        0x080391CC
+#define FW_DUE2_4       0x0803958C
 #define FW_POPUP        0x080100BC
 #define FW_POPUP_TIMER  0x0801F7D8
 #define FW_LED_FLUSH    0x08054C2C

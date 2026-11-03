@@ -49,6 +49,22 @@
     },
     {
       "at": {
+        "standard": "0x080391C8",
+        "chroma": "0x08039780"
+      },
+      "asm": "b.w gen_due_hook",
+      "what": "the deferred note-ons FUN_080391C8(seq, track): a swung or shifted generative note is looked up when due"
+    },
+    {
+      "at": {
+        "standard": "0x08039588",
+        "chroma": "0x08039B40"
+      },
+      "asm": "b.w gen_due2_hook",
+      "what": "the other deferred note-ons FUN_08039588(seq, track), the same for a generative track"
+    },
+    {
+      "at": {
         "standard": "0x08012730",
         "chroma": "0x08012944"
       },

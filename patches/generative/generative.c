@@ -70,9 +70,11 @@ typedef uint32_t u32;
 #define last_step  FW(FW_LAST_STEP, void (*)(u8 *seq, int last, int t, int lane))
 
 void gen_play_orig(u8 *seq, int t);                       // hooks.S: the stock step player
+void gen_due_orig(u8 *seq, int t);                        // hooks.S: the stock deferred note-ons FUN_080391C8
+void gen_due2_orig(u8 *seq, int t);                       //   and FUN_08039588
 
 // ---- state (SDRAM) ----------------------------------------------------------------------------------------------
-#define MAGIC 0x47454E32u                                 // "GEN2"
+#define MAGIC 0x47454E33u                                 // "GEN3"
 #define NT 4
 
 typedef struct {
@@ -101,6 +103,9 @@ static struct {
     u8 rf_flag[NT][16], rf_note[NT][16], rf_vel[NT][16];   // Flux: played, its note (0xFF: a rest), its velocity
     u8 rl_flag[NL][16], rl_hit[NL][16];                    // Pulse: per lane and step, played and its velocity (0: none)
     u8 rec_wrote[NT];                                      // written since entering: leaving lines the pattern up
+    // the step last played, shown again to the deferred note-ons (gen_due); lent[t]: set since entering
+    u8 lent[NT], f_step[NT], f_proj[NT], f_pat[NT], f_i[NT];   // Flux
+    u8 p_proj, p_pat, p_n, p_row[16];                          // Pulse
 } g;
 
 static void init(void)
@@ -206,6 +211,7 @@ static void enter(int t)
     }
     s->pos = 0; s->cur = 0xFF; s->flash = 0;
     g.rec_wrote[t] = 0;
+    g.lent[t] = 0;
     for (int i = 0; i < 16; i++) {
         g.rf_flag[t][i] = 0;
         for (int l = 0; l < NL; l++)
@@ -333,6 +339,7 @@ static void leave(int t)
         g.rec_wrote[t] = 0;
     }
     s->active = 0;
+    g.lent[t] = 0;
     LEDS[0x11 + t] = 1;                                     // the pattern number comes back
     mark_steps_dirty();
     g.sent_valid = 0;
@@ -407,6 +414,12 @@ int gen_on_press(int code, u8 *panel)
 }
 
 // ---- playing a step (TIM2 compare interrupt) ------------------------------------------------------------------------
+// A note-on the player schedules for later (swing, Time Shift) is queued as (slot, row) and looked up when it is due,
+// by FUN_080391C8 - after the step has been put back. So the step decided here is kept (g.lent) and gen_due shows it
+// again to that handler.
+static void flux_lend(u8 *seq, int t, void (*play)(u8 *, int));
+static void pulse_lend(u8 *seq, void (*play)(u8 *, int));
+
 static void flux_play(u8 *seq, int t)
 {
     track_t *s = &g.trk[t];
@@ -429,8 +442,18 @@ static void flux_play(u8 *seq, int t)
     // the pattern's playback direction (Shift + Fwd / Rand / Walk): bits 3..4 of its settings byte
     int dir = (seq[proj * PROJ_STRIDE + t * 0x140 + pat * 0x14 + 0x939] >> 3) & 3;
     s->pos = (u8)next_pos(dir, i, len);
-    // the track's whole slot table is blanked, not just this step's row: the player's look-ahead also plays the next
-    // step's notes that are nudged ahead of it (Time Shift)
+    g.f_step[t] = (u8)step; g.f_proj[t] = (u8)proj; g.f_pat[t] = (u8)pat; g.f_i[t] = (u8)i;
+    g.lent[t] = 1;
+    flux_lend(seq, t, gen_play_orig);
+}
+
+// Shows the player (`play`: the step player, or the deferred note-ons) the step flux_play decided: the track's whole
+// slot table is blanked, not just this step's row - the player's look-ahead also plays the next step's notes that are
+// nudged ahead of it (Time Shift) - and every byte is put back after.
+static void flux_lend(u8 *seq, int t, void (*play)(u8 *, int))
+{
+    track_t *s = &g.trk[t];
+    int step = g.f_step[t], proj = g.f_proj[t], pat = g.f_pat[t], i = g.f_i[t];
     u8 *table = (u8 *)(RAM_SLOTS + (u32)t * 0x400);
     u8 *slots = table + step * 0x10;
     u8 *pool = (u8 *)(0xC0000000u + (u32)proj * 0xF000 + (u32)t * 0x3C00 + (u32)pat * 0x3C0);   // entry 0
@@ -461,7 +484,7 @@ static void flux_play(u8 *seq, int t)
         *onw = save_on & ~bit;                              // a rest
     }
 
-    gen_play_orig(seq, t);
+    play(seq, t);
 
     for (int k = 0; k < 64 * 16; k++)
         table[k] = g.slot_save[k];
@@ -482,13 +505,7 @@ static void pulse_play(u8 *seq)
     u8 *rec = seq + proj * PROJ_STRIDE + pat * 0x20 + 0xE36;       // the drum pattern record
     int dir = (rec[0x19] >> 6) & 3;                         // Drum mode's own Fwd / Rand / Walk
     u8 *head = seq + (dir ? 0x1EB : 0x1D3);                 // the per-lane playheads (Rand/Walk keep their own)
-    u8 *slots = (u8 *)RAM_SLOTS;                          // Track 1's rows, 64 x 16
-    u8 *pool = (u8 *)(0xC0114000u + (u32)proj * 0x3C00 + (u32)pat * 0x3C0);
-    u8 *nib = (u8 *)(0xC010E000u + (u32)proj * 0x600 + (u32)pat * 0x60);
-    u8 *tie = (u8 *)RAM_TIES;
-    u32 *on = (u32 *)(0xC0150000u + (u32)(pat * 0x18 + proj * 0x180) * 8);   // lane l: on[2l], on[2l+1]
-    u8 *save_pool = g.save_pool, *save_nib = g.save_nib, *save_tie = g.save_tie, *who = g.who;
-    u32 (*save_on)[2] = g.save_on;
+    u8 *who = g.who;
     int n = 0;
 
     for (int l = 0; l < NL; l++) {                          // the lanes that play on this step
@@ -512,6 +529,25 @@ static void pulse_play(u8 *seq)
             g.rl_flag[l][i] = 1;
         }
     }
+    for (int j = 0; j < n; j++)
+        g.p_row[j] = head[who[j]] & 0x3F;
+    g.p_proj = (u8)proj; g.p_pat = (u8)pat; g.p_n = (u8)n;
+    g.lent[0] = 1;
+    pulse_lend(seq, gen_play_orig);
+}
+
+// Shows the player (`play`: the step player, or the deferred note-ons) the step pulse_play decided, then puts every
+// byte back.
+static void pulse_lend(u8 *seq, void (*play)(u8 *, int))
+{
+    int proj = g.p_proj, pat = g.p_pat, n = g.p_n;
+    u8 *slots = (u8 *)RAM_SLOTS;                          // Track 1's rows, 64 x 16
+    u8 *pool = (u8 *)(0xC0114000u + (u32)proj * 0x3C00 + (u32)pat * 0x3C0);
+    u8 *nib = (u8 *)(0xC010E000u + (u32)proj * 0x600 + (u32)pat * 0x60);
+    u8 *tie = (u8 *)RAM_TIES;
+    u32 *on = (u32 *)(0xC0150000u + (u32)(pat * 0x18 + proj * 0x180) * 8);   // lane l: on[2l], on[2l+1]
+    u8 *save_pool = g.save_pool, *save_nib = g.save_nib, *save_tie = g.save_tie, *who = g.who;
+    u32 (*save_on)[2] = g.save_on;
     for (int k = 0; k < 64 * 16; k++) {
         g.slot_save[k] = slots[k];
         slots[k] = 0xFF;
@@ -521,7 +557,7 @@ static void pulse_play(u8 *seq)
     for (int k = 0; k < 8; k++)
         save_nib[k] = nib[k];
     for (int j = 0; j < n; j++) {
-        int l = who[j], row = head[l] & 0x3F;
+        int l = who[j], row = g.p_row[j];
         save_tie[j] = tie[j];
         save_on[j][0] = on[2 * l];
         save_on[j][1] = on[2 * l + 1];
@@ -541,7 +577,7 @@ static void pulse_play(u8 *seq)
         on[2 * l + (row >= 32)] |= 1u << (row & 31);
     }
 
-    gen_play_orig(seq, 0);
+    play(seq, 0);
 
     for (int j = n - 1; j >= 0; j--) {
         int l = who[j];
@@ -568,6 +604,19 @@ void gen_play(u8 *seq, int t)
     else
         flux_play(seq, t);
 }
+
+static void due(u8 *seq, int t, void (*orig)(u8 *, int))  // the note-ons now due of a generative track
+{
+    if (!g.lent[t])
+        orig(seq, t);                                       // queued before the track went generative: stock
+    else if (g.trk[t].active == 2)
+        pulse_lend(seq, orig);
+    else
+        flux_lend(seq, t, orig);
+}
+
+void gen_due(u8 *seq, int t) { due(seq, t, gen_due_orig); }       // hooks.S
+void gen_due2(u8 *seq, int t) { due(seq, t, gen_due2_orig); }
 
 // ---- encoders and the OLED -------------------------------------------------------------------------------------------
 static const char *const NAMES[5] = {"Range", "Loop Length", "Density", "Change", "Riff"};

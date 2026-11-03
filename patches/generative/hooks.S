@@ -49,6 +49,44 @@ gen_play_orig:
     push.w  {r4, r5, r6, r7, r8, r9, r10, r11, lr}
     b.w     FW_PLAY_4
 
+@ ---- the deferred note-ons: replace `push.w {r4-r11,lr}` at FUN_08039588(seq, track) and FUN_080391C8(seq, track) --
+@ The timer plays a note-on the step player queued for later (swing, Time Shift) by looking up its slot when it is due,
+@ with one of the two (FUN_08048xxx picks one per track).
+    .global gen_due_hook
+    .thumb_func
+gen_due_hook:
+    push    {r0, r1, r2, r3, r12, lr}
+    mov     r0, r1
+    bl      gen_is_active
+    cmp     r0, #0
+    pop     {r0, r1, r2, r3, r12, lr}
+    beq     gen_due_orig
+    b.w     gen_due                 @ generative track: generative.c shows it the step again (returns to the caller)
+
+    .global gen_due2_hook
+    .thumb_func
+gen_due2_hook:
+    push    {r0, r1, r2, r3, r12, lr}
+    mov     r0, r1
+    bl      gen_is_active
+    cmp     r0, #0
+    pop     {r0, r1, r2, r3, r12, lr}
+    beq     gen_due2_orig
+    b.w     gen_due2
+
+@ C-callable: the stock ones, untouched
+    .global gen_due_orig
+    .thumb_func
+gen_due_orig:
+    push.w  {r4, r5, r6, r7, r8, r9, r10, r11, lr}
+    b.w     FW_DUE_4
+
+    .global gen_due2_orig
+    .thumb_func
+gen_due2_orig:
+    push.w  {r4, r5, r6, r7, r8, r9, r10, r11, lr}
+    b.w     FW_DUE2_4
+
 @ ---- encoder turns: replace `sub.w r8, r6, #3` at 0x08012730 (up) / 0x08013BE6 (down) in FUN_08012338 ----------------
 @ r6 = b3 (knob code), [sp+0x6b] = magnitude. r8 = knob index for the stock code, or 0xFF when generative.c took the turn
 @ (the stock `cmp r8,#4; bhi` then skips to the next event). Every other register is kept.
