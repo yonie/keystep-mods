@@ -298,6 +298,10 @@ patcher's copy (`web/patches/`).
 - `patches/` - `make_patch.py`, the free flash and RAM, and one folder per mod.
 - `docs/` - how each mod hooks the firmware: `docs/GENERATIVE.md`, `docs/FILTER_MIDICC.md`, `docs/TRACK_CC.md`.
 
+## Changes
+
+Current version: 1.1.1. What changed in each version is in [CHANGELOG.md](CHANGELOG.md).
+
 ## Licence
 
 MIT, see `LICENSE`. Arturia and KeyStep Pro are trademarks of Arturia; this project is not affiliated with Arturia.
