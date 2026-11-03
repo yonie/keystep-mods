@@ -99,6 +99,7 @@
   #drop b { color: var(--ink); }
   code { font: 13px ui-monospace, Consolas, monospace; background: var(--bg); padding: 1px 5px; border-radius: 4px;
          overflow-wrap: anywhere; }
+  .lead { color: var(--muted); font-size: 14px; margin: -6px 2px 12px; }
   .hint { color: var(--muted); font-size: 13px; margin: 10px 2px 0; }
   .status { margin-top: 10px; font-weight: 500; }
   .risk { border: 1px solid var(--bad); border-left-width: 5px; border-radius: 8px; padding: 12px 16px; margin: 0 0 28px;
@@ -151,11 +152,13 @@
 
   <section>
     <h2><span class="n">1</span>Pick your mods</h2>
+    <p class="lead">Tick the mods you want. You can combine them.</p>
     <div id="mods"></div>
   </section>
 
   <section>
-    <h2><span class="n">2</span>Upload stock firmware</h2>
+    <h2><span class="n">2</span>Add your stock firmware</h2>
+    <p class="lead">Drop in the official 2.5.20 update file. It never leaves this browser.</p>
     <div id="drop" tabindex="0"><b>Drop the KeyStep Pro firmware update here</b>, or click to choose it
       <input id="file" type="file" accept=".kspf" hidden></div>
     <p class="hint">It is the file MIDI Control Center installed:
@@ -164,7 +167,8 @@
   </section>
 
   <section>
-    <h2><span class="n">3</span>Get your custom firmware</h2>
+    <h2><span class="n">3</span>Build your firmware</h2>
+    <p class="lead">Your custom firmware is made right here. Flash it with MIDI Control Center.</p>
     <div class="box">
       <label class="agree"><input type="checkbox" id="agree"> I understand that I flash this modified firmware at my own
         risk, and that the author is not responsible for any damage to my instrument.</label>
