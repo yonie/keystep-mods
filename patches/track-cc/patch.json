@@ -1,43 +1,32 @@
 {
   "name": "track-cc",
   "title": "Control mode follows selected track",
-  "pitch": "In Control mode the five knobs send their CCs on the MIDI channel of the track you came from, so they reach the synth that track plays. Knobs set to Global follow the track; knobs set to 1..16 keep their fixed channel.",
-  "description": "In Control mode, knobs on the Global channel send on the MIDI channel of the track Control mode was entered from",
+  "pitch": "In Control mode the five knobs send their CCs on the MIDI channel of the track you came from, so they reach the synth that track plays. Knobs set to Global follow the track; knobs set to 1..16 keep their fixed channel. Each pattern remembers where you left those knobs: when the pattern's sound is loaded again (a pattern switch or a Program Change) your tweaks are sent right after it, and Save Project keeps them.",
+  "description": "In Control mode, knobs on the Global channel send on the MIDI channel of the track Control mode was entered from; what they send is kept per pattern, resent after each Program Change or switch to that pattern, and saved with the project",
   "firmware": {
     "version": "2.5.20"
   },
-  "source": "track-cc.s",
+  "sources": [
+    "track-cc.c",
+    "hooks.S"
+  ],
   "models": {
     "standard": {
       "image": "keysteppro_main__fw2_5_20_2085__2024_03_04.bin",
       "place": {
-        "flash": "0x08060000"
-      },
-      "symbols": {
-        "UP_RESUME": "0x08012B1C",
-        "DOWN_RESUME": "0x08013FE8",
-        "MODE": "0x200001A4",
-        "TRACK": "0x20004DB7",
-        "PROJECT": "0x20004DAD",
-        "SEQ": "0x20001498",
-        "SETTINGS": "0x20000874",
-        "DRUM": "0x0802B55C"
+        "flash": "0x08060000",
+        "flash_size": "0x1000",
+        "ram": "0xC01ED000",
+        "ram_size": "0x1800"
       }
     },
     "chroma": {
       "image": "keysteppro_main_chroma__fw2_5_20_375__2024_03_04.bin",
       "place": {
-        "flash": "0x08060800"
-      },
-      "symbols": {
-        "UP_RESUME": "0x08012D30",
-        "DOWN_RESUME": "0x080141FC",
-        "MODE": "0x200001A8",
-        "TRACK": "0x20004DD7",
-        "PROJECT": "0x20004DCD",
-        "SEQ": "0x2000149C",
-        "SETTINGS": "0x20000878",
-        "DRUM": "0x0802BA80"
+        "flash": "0x08060800",
+        "flash_size": "0x1000",
+        "ram": "0xC01ED000",
+        "ram_size": "0x1800"
       }
     }
   },
@@ -57,6 +46,54 @@
       },
       "asm": "b.w knob_down",
       "what": "the encoder handler FUN_08012338, a knob turned down in Control mode: its Channel setting is read"
+    },
+    {
+      "at": {
+        "standard": "0x0801A86A",
+        "chroma": "0x0801A9C6"
+      },
+      "asm": "bl pc_tail",
+      "what": "the Program Change sender FUN_0801A708: its last send, the PC itself"
+    },
+    {
+      "at": {
+        "standard": "0x0803555C",
+        "chroma": "0x08035B88"
+      },
+      "asm": "b.w sw_check",
+      "what": "the pattern switch FUN_08035404: the test of its send flag before the PC block"
+    },
+    {
+      "at": {
+        "standard": "0x08035562",
+        "chroma": "0x08035B8E"
+      },
+      "asm": "b.w sw_merge",
+      "what": "the pattern switch FUN_08035404: where the PC block and the no-PC path meet"
+    },
+    {
+      "at": {
+        "standard": "0x080475D8",
+        "chroma": "0x08047C2C"
+      },
+      "asm": "b.w save_hook",
+      "what": "the entry of FUN_080475D8, erase + program a NOR sector from the staging buffer"
+    },
+    {
+      "at": {
+        "standard": "0x08046858",
+        "chroma": "0x08046DB8"
+      },
+      "asm": "b.w load_hook",
+      "what": "the entry of FUN_08046858, a project loaded from NOR (boot, Copy and Erase Project, MIDI Control Center)"
+    },
+    {
+      "at": {
+        "standard": "0x0802418C",
+        "chroma": "0x08024434"
+      },
+      "asm": "bl copy_hook",
+      "what": "Copy Project's call of the project save FUN_08047C84(h, src, dst)"
     }
   ]
 }

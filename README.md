@@ -234,13 +234,16 @@ With `filter-midicc` the KeyStep remembers, per MIDI channel, what it last sent 
 switch sends nothing when that channel already has those values. Any difference sends all three as before. The
 first switch after power-on always sends.
 
-Play also sends each track's sound, which the stock firmware never does, so you can switch the KeyStep and the
-synth off and on as often as you like:
+Play and the first key also send each track's sound after power-on, which the stock firmware never does, so you can
+switch the KeyStep and the synth off and on together as often as you like:
 
-- **Play** always sends every track's sound, so the synth has it from the first note after power-on, and a synth
-  switched off and on on its own gets it back at the next Play.
-- **The first key** after power-on, or after Stop, sends the current track's sound before its note. The next keys
-  send nothing.
+- **Play** sends every track's sound the synth does not have yet, so it has it from the first note after power-on.
+  After that, Stop and Play send nothing: a program change makes the synth reload its patch, which would undo the
+  knob tweaks you made on it.
+- **The first key** after power-on sends the current track's sound before its note. The next keys send nothing.
+
+A synth switched off and on on its own, while the KeyStep stays on, gets its sound back at the next pattern switch
+to another program, or when you switch the KeyStep off and on too.
 
 If you change the sound on the synth by hand, a switch to a pattern with the same Program Change will not send it
 again. Switch to a pattern with another program, or flash the stock update, to get the old behaviour.
@@ -260,12 +263,25 @@ the track whose button blinks while Control is on. Select Track 2, press Control
 Track 2 plays, say a JV-1010 on channel 3, to sweep its cutoff and resonance. Select another track, press Control
 again, and the knobs follow that track's channel. Track 1 in Drum mode uses its Drum Output channel.
 
-- **No new settings.** The mod adds no menu choice and stores nothing: settings and MIDI Control Center work and
-  save exactly as on stock. Global simply means "the track's channel" in Control mode.
+- **No new settings.** The mod adds no menu choice: settings and MIDI Control Center work and save exactly as on
+  stock. Global simply means "the track's channel" in Control mode.
 - **CC numbers, Port, Min and Max** stay as set per knob.
 - **A knob set to its own channel** (1 to 16) keeps sending there. Use that for a knob that should always reach one
   synth.
 - **Outside Control mode** nothing changes.
+
+### Your tweaks stay with the pattern
+
+A Program Change makes the synth reload its stored patch, which throws away everything you did with the knobs since.
+So each pattern remembers where you left the knobs that follow its track:
+
+- **Turn a knob** in Control mode and its value is kept for the current pattern of that track.
+- **When that pattern's sound comes back** (a switch to the pattern, or any Program Change the KeyStep sends for the
+  track) the kept values go out right after it, before the first note. Only the knobs you turned are sent; a
+  pattern you never tweaked sends nothing.
+- **Save Project** (or Save Pattern or Save Track) stores them with the project, so they are back after power-off.
+  Tweaks you did not save are gone after power-off, like any unsaved edit. Copy Project takes them along, Erase
+  Project clears them.
 
 ## For developers
 

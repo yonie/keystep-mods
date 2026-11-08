@@ -15,7 +15,6 @@
 @   0x0801A7E8  LDR.W r8,[pc,#0x94]  ->  B.W check_and_record   (FUN_0801A708, after the channel and range
 @               checks, before the three sends)
 @   0x0803BCB6  LDRB.W fp,[r4,#0xc]  ->  B.W play_start   (FUN_0803B578(seq, 0xFA), Play: fp = the play flag)
-@   0x0803C498  MOVS r5,#0 ; STR r5,[sp,#4]  ->  B.W stop_forget   (FUN_0803B578(seq, 0xFC), Stop)
 @   0x080166A4  BL FUN_0803B1FC  ->  BL boot_forget   (the boot constructs the sequencer object, once)
 @   0x0801534C  LDR r3,[pc,#0x198] ; LDR r2,[r3]  ->  B.W key_press   (the panel handler's key-press case)
 
@@ -87,10 +86,11 @@ send_done:
     add     sp, #8
     pop     {r4, r5, r6, r7, r8, r9, r10, pc}
 
-@ ---- play_start: Play from stopped always sends each track's sound -----------------------------------------
+@ ---- play_start: Play from stopped sends each track's sound the channel does not have yet ------------------
 @ The stock firmware only sends it on a pattern switch, so a synth switched on with the KeyStep keeps its own sound
-@ until the first switch. Play sends it unconditionally, so a synth that was switched off and on on its own gets
-@ its sound back too. Live here: r4 = the sequencer object; fp is the replaced load and is left as is.
+@ until the first switch. Play sends it through switch_send: only when the channel's record does not know it, so
+@ after power-on. A sound already sent is not sent again: a synth reloads its patch on a program change, which
+@ would undo every knob tweak made since. Live here: r4 = the sequencer object; fp is the replaced load.
 play_start:
     ldrb.w  fp, [r4, #0xc]          @ the instruction the hook replaced: the play flag
     cmp.w   fp, #0
@@ -100,7 +100,7 @@ play_start:
 play_track:
     mov     r0, r4
     mov     r1, r5
-    movs    r2, #0
+    movs    r2, #1
     bl      send_track
     adds    r5, #1
     cmp     r5, #4
@@ -131,9 +131,10 @@ key_done:
     ldr     r2, [r3]
     b.w     {KEY_BACK}
 
-@ ---- forget: the record is not trusted after a boot or a Stop ----------------------------------------------
+@ ---- boot_forget: the record is not trusted after a boot -------------------------------------------------
 @ The SDRAM keeps its contents through a short power-off, so a record from before a reboot would otherwise say
-@ the synth (switched off and on too) still has its sound. Stop forgets as well, so the next key sends again.
+@ the synth (switched off and on too) still has its sound. Stop does not forget: a Play after it would resend
+@ the sound and the synth would drop the knob tweaks made on it.
 boot_forget:                        @ the boot's call to the sequencer constructor comes through here
     push    {r0, r1}
     movw    r0, #{MAGIC_LO}
@@ -142,13 +143,6 @@ boot_forget:                        @ the boot's call to the sequencer construct
     str     r1, [r0]
     pop     {r0, r1}
     b.w     {CONSTRUCTOR}
-stop_forget:                        @ FUN_0803B578(seq, 0xFC): its first two instructions, plus the forget
-    movs    r5, #0
-    movw    ip, #{MAGIC_LO}
-    movt    ip, #{MAGIC_HI}
-    str     r5, [ip]
-    str     r5, [sp, #4]
-    b.w     {STOP_BACK}
 
 @ ---- check_and_record: inside FUN_0801A708 -------------------------------------------------------------
 @ Live here: r7 = MIDI channel (the sender masks it with 0xF), r5 = MSB, r6 = LSB, r4 = PC (wire value 0..127).

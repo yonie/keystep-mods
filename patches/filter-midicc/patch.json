@@ -26,7 +26,6 @@
         "GET_MSB": "0x0802F112",
         "GET_LSB": "0x0802F14C",
         "GET_PC": "0x0802F0D8",
-        "STOP_BACK": "0x0803C49C",
         "CONSTRUCTOR": "0x0803B1FC",
         "KEY_BACK": "0x08015350",
         "KEY_LIT": "0x20000014",
@@ -52,7 +51,6 @@
         "GET_MSB": "0x0802F884",
         "GET_LSB": "0x0802F8B8",
         "GET_PC": "0x0802F850",
-        "STOP_BACK": "0x0803CA14",
         "CONSTRUCTOR": "0x0803B790",
         "KEY_BACK": "0x08015564",
         "KEY_LIT": "0x20000014",
@@ -89,15 +87,7 @@
         "chroma": "0x0803C236"
       },
       "asm": "b.w play_start",
-      "what": "FUN_0803B578(seq, 0xFA), Play from stopped: every track's sound is sent"
-    },
-    {
-      "at": {
-        "standard": "0x0803C498",
-        "chroma": "0x0803CA10"
-      },
-      "asm": "b.w stop_forget",
-      "what": "FUN_0803B578(seq, 0xFC), Stop: the record is forgotten"
+      "what": "FUN_0803B578(seq, 0xFA), Play from stopped: each track's sound its channel does not have yet is sent"
     },
     {
       "at": {

@@ -6,7 +6,7 @@
  "firmware": {
   "version": "2.5.20"
  },
- "release": "1.1.1",
+ "release": "1.2.0",
  "parts": [
   {
    "model": "standard",

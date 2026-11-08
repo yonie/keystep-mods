@@ -32,7 +32,9 @@
         "flash": "0x0802F010..0x0802F100"
       },
       "track-cc": {
-        "flash": "0x08060000..0x08060100"
+        "flash": "0x08060000..0x08061000",
+        "ram": "0xC01ED000..0xC01EE800",
+        "nor": "0xE000..0xE14C in sector A of every project (0x60000000 + p * 0x20000), inside the range the firmware never fills"
       }
     },
     "chroma": {
@@ -48,7 +50,9 @@
         "flash": "0x0802F010..0x0802F100"
       },
       "track-cc": {
-        "flash": "0x08060800..0x08060900"
+        "flash": "0x08060800..0x08061800",
+        "ram": "0xC01ED000..0xC01EE800",
+        "nor": "0xE000..0xE14C in sector A of every project (0x60000000 + p * 0x20000), inside the range the firmware never fills"
       }
     }
   },
