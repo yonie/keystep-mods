@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.2.0 - 2026-11-08
+## 1.1.2 - 2026-11-08
 
 - **`track-cc`:** each pattern remembers where you left the knobs in Control mode. When the pattern's sound is loaded
   again (a pattern switch or a Program Change) your knob values are sent right after it, so the synth keeps your

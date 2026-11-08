@@ -8,7 +8,7 @@ window.KSP_PATCHES = [
   "firmware": {
    "version": "2.5.20"
   },
-  "release": "1.2.0",
+  "release": "1.1.2",
   "parts": [
    {
     "model": "standard",
@@ -112,7 +112,7 @@ window.KSP_PATCHES = [
   "firmware": {
    "version": "2.5.20"
   },
-  "release": "1.2.0",
+  "release": "1.1.2",
   "parts": [
    {
     "model": "standard",
@@ -318,7 +318,7 @@ window.KSP_PATCHES = [
   "firmware": {
    "version": "2.5.20"
   },
-  "release": "1.2.0",
+  "release": "1.1.2",
   "parts": [
    {
     "model": "standard",
@@ -447,7 +447,7 @@ window.KSP_PATCHES = [
 ];
 window.KSP_CHANGELOG = [
  {
-  "version": "1.2.0",
+  "version": "1.1.2",
   "date": "2026-11-08",
   "items": [
    "**`track-cc`:** each pattern remembers where you left the knobs in Control mode. When the pattern's sound is loaded again (a pattern switch or a Program Change) your knob values are sent right after it, so the synth keeps your tweaks. Save Project stores them with the project.",
