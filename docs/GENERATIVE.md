@@ -18,7 +18,7 @@ same. Sources: `patches/generative/generative.c` (the logic, C), `patches/genera
 | main RAM | `0xC01EC000..0xC01ECF00` (SDRAM) | a block of the 2 MB SDRAM the firmware never uses; about 0x700 bytes used, 1 KB of it the Pulse save area |
 | UI flash | `0x0802F010..0x0802F100` | after the stock UI image (ends `0x0802F004`); 52 bytes used, no RAM |
 
-That SDRAM is not cleared at boot, so the state carries a marker (`"GEN3"`) and is zeroed the first time any hook
+That SDRAM is not cleared at boot, so the state carries a marker (`"GEN4"`) and is zeroed the first time any hook
 runs without it. (Not the CCM at `0x10000000`: the main MCU has no working CCM, and a first build that kept its
 state there left the unit on its boot logo.) `make_patch.py` builds the C with arm-none-eabi-gcc (`-Os`, no libc, `.data` must be empty)
 and links it at those addresses.

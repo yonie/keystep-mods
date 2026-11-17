@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.3 - 2026-11-17
+
+- **Generative, Flux:** turning Density keeps your loop. Steps drop out as you turn it down and the same steps come
+  back as you turn it up; it no longer rolls new rests. ([#3](https://github.com/yonie/keystep-mods/issues/3))
+- **Generative, Flux:** turning Range keeps the melody. The notes spread wider or closer around middle C in the same
+  order, and turning back gives the same notes again.
+
 ## 1.1.2 - 2026-11-08
 
 - **`track-cc`:** each pattern remembers where you left the knobs in Control mode. When the pattern's sound is loaded

@@ -74,9 +74,14 @@ void gen_due_orig(u8 *seq, int t);                        // hooks.S: the stock 
 void gen_due2_orig(u8 *seq, int t);                       //   and FUN_08039588
 
 // ---- state (SDRAM) ----------------------------------------------------------------------------------------------
-#define MAGIC 0x47454E33u                                 // "GEN3"
+#define MAGIC 0x47454E34u                                 // "GEN4"
 #define NT 4
 
+// A Flux step keeps its note and its odds as positions, so the knobs re-read them instead of rolling new ones:
+// note[i] is where the note sits inside the Range (0..255), on[i] the step's threshold (0..99: it plays while that is
+// below Density; ON_FORCED / OFF_FORCED: turned on or off with its step button, whatever Density says).
+#define ON_FORCED  0xFE
+#define OFF_FORCED 0xFF
 typedef struct {
     u8 active, len, density, range, change, pos, cur, flash;   // active: 1 Flux, 2 Pulse
     u8 note[16], on[16], vel[16];
@@ -130,9 +135,19 @@ static u32 rnd(u32 n)                                     // 0 .. n-1 (xorshift3
 
 static void roll_step(track_t *s, int i)
 {
-    s->note[i] = (u8)rnd(s->range);
-    s->on[i] = rnd(100) < s->density;
+    s->note[i] = (u8)rnd(256);
+    s->on[i] = (u8)rnd(100);
     s->vel[i] = (u8)(84 + rnd(40));
+}
+
+static int plays(const track_t *s, int i)                 // the step plays a note (else a rest)
+{
+    return s->on[i] == ON_FORCED || s->on[i] < s->density;
+}
+
+static int pitch(const track_t *s, int i)                 // its note: Range semitones spread around middle C
+{
+    return 60 - s->range / 2 + s->note[i] * s->range / 256;
 }
 
 static void roll_all(track_t *s)
@@ -384,7 +399,7 @@ int gen_on_press(int code, u8 *panel)
             track_t *s = &g.trk[sel];                       // pattern is never edited from here)
             int i = code - 0x2E;
             if (s->active == 1 && i < s->len) {
-                s->on[i] ^= 1;
+                s->on[i] = plays(s, i) ? OFF_FORCED : ON_FORCED;
                 g.sent_valid = 0;
             }
             panel[0x6C + code * 3 + 2] = 1;                 // not held: a key now must not step-enter a note
@@ -431,7 +446,7 @@ static void flux_play(u8 *seq, int t)
     }
     s->cur = (u8)i;
     if (REC_ARMED) {                                        // Record: this step is written into the pattern
-        g.rf_note[t][i] = s->on[i] ? (u8)(60 - s->range / 2 + s->note[i]) : 0xFF;
+        g.rf_note[t][i] = plays(s, i) ? (u8)pitch(s, i) : 0xFF;
         g.rf_vel[t][i] = s->vel[i];
         BARRIER();
         g.rf_flag[t][i] = 1;
@@ -469,10 +484,9 @@ static void flux_lend(u8 *seq, int t, void (*play)(u8 *, int))
     for (int k = 0; k < 5; k++)
         save_pool[k] = pool[k];
 
-    if (s->on[i]) {
-        int base = 60 - s->range / 2;
+    if (plays(s, i)) {
         slots[0] = 0;
-        pool[0] = (u8)(base + s->note[i]);
+        pool[0] = (u8)pitch(s, i);
         pool[1] = 7;                                        // gate: 50 %
         pool[2] = s->vel[i];
         pool[3] = 0x31;                                     // no micro-offset
@@ -732,11 +746,7 @@ int gen_turn(int b3, int up, int mag)
     switch (b3 - 3) {
     case 0: s->range = (u8)clamp(s->range + n, 1, 36); break;
     case 1: s->len = (u8)clamp(s->len + n, 1, 16); s->pos = (u8)(s->pos % s->len); break;
-    case 2:
-        s->density = (u8)clamp(s->density + 5 * n, 0, 100);
-        for (int i = 0; i < 16; i++)
-            s->on[i] = rnd(100) < s->density;
-        break;
+    case 2: s->density = (u8)clamp(s->density + 5 * n, 0, 100); break;   // steps join or drop out, notes stay
     case 3: s->change = (u8)clamp(s->change + 5 * n, 0, 100); break;
     default: roll_all(s); break;
     }
@@ -781,7 +791,7 @@ static void step_colour(int k, u8 *rgb)
         rgb[0] = 0x7F; rgb[1] = 0x7F; rgb[2] = 0x7F;
     } else if (s->flash == k + 1) {                         // just changed
         rgb[0] = 0x6A; rgb[1] = 0x00; rgb[2] = 0x50;
-    } else if (s->on[k]) {                                  // plays
+    } else if (plays(s, k)) {                               // plays
         rgb[0] = 0x00; rgb[1] = 0x38; rgb[2] = 0x30;
     } else {                                                // a rest inside the loop
         rgb[0] = 0x04; rgb[1] = 0x05; rgb[2] = 0x05;
